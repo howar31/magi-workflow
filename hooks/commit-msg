@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# maestro-workflow commit-msg hook
+# Enforces Conventional Commits subject line:
+#   <type>[(<scope>)][!]: <subject>
+# where:
+#   - type ∈ {feat, fix, docs, refactor, perf, test, build, ci, chore, revert}
+#   - subject is non-empty, lowercase first letter, no trailing period
+#
+# Skip with: MAESTRO_SKIP_HOOKS=1 git commit ...
+
+set -uo pipefail
+
+if [[ "${MAESTRO_SKIP_HOOKS:-0}" == "1" ]]; then
+  exit 0
+fi
+
+msg_file="${1:-}"
+[[ -z "$msg_file" || ! -f "$msg_file" ]] && exit 0
+
+# Extract first non-empty, non-comment line (subject).
+subject=$(grep -vE '^\s*$|^\s*#' "$msg_file" | head -1)
+[[ -z "$subject" ]] && {
+  echo "✗ commit-msg: empty commit message" >&2
+  exit 1
+}
+
+# Allow merge commits and revert auto-messages.
+case "$subject" in
+  "Merge "*|"Revert \""*) exit 0 ;;
+esac
+
+# Conventional Commits regex.
+# type(scope)!: subject  — scope and ! optional
+pattern='^(feat|fix|docs|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._-]+\))?(!)?: [^A-Z][^.]+[^.]$'
+
+# Note: the [^A-Z] check enforces lowercase first letter of subject;
+# the [^.]$ enforces no trailing period.
+
+if ! [[ "$subject" =~ $pattern ]]; then
+  cat >&2 <<EOF
+✗ commit-msg: subject does not match Conventional Commits.
+
+  Got:     $subject
+
+  Expected:
+    <type>[(<scope>)][!]: <subject>
+
+  type ∈ {feat, fix, docs, refactor, perf, test, build, ci, chore, revert}
+  subject:
+    • starts lowercase
+    • no trailing period
+    • imperative mood ("add foo", not "adds foo")
+    • ≤ 72 characters preferred
+
+  Examples:
+    feat(auth): add OAuth callback
+    fix: handle empty user list
+    docs(readme): clarify setup step
+    refactor!: drop deprecated v1 API
+
+  Bypass once: MAESTRO_SKIP_HOOKS=1 git commit ...
+
+EOF
+  exit 1
+fi
+
+# Length check (warn, don't block).
+subject_len=${#subject}
+if (( subject_len > 72 )); then
+  echo "⚠ commit-msg: subject is $subject_len chars; consider trimming to ≤ 72." >&2
+fi
+
+exit 0

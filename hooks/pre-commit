@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# maestro-workflow pre-commit hook
+# Auto-detects the project's lint / type-check / format-check commands
+# and runs them on staged content. Non-zero exit blocks the commit.
+#
+# Detection priority per language:
+#   • node: pnpm > npm > yarn  →  scripts: lint, typecheck (or type-check), format:check
+#   • python: ruff > flake8;   mypy / pyright if config present
+#   • go:    go vet ./...; staticcheck if installed
+#   • rust:  cargo fmt --check; cargo clippy --all-targets -- -D warnings
+#
+# Each runs only if the relevant config / lockfile is present at repo root.
+# Quiet on no-config; loud on failure.
+#
+# Skip with: MAESTRO_SKIP_HOOKS=1 git commit ...
+
+set -uo pipefail
+
+if [[ "${MAESTRO_SKIP_HOOKS:-0}" == "1" ]]; then
+  exit 0
+fi
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+cd "$repo_root"
+
+failures=0
+ran_anything=0
+
+run() {
+  local label="$1"; shift
+  ran_anything=1
+  echo "▸ pre-commit: $label" >&2
+  if ! "$@" >&2; then
+    echo "✗ pre-commit: $label failed" >&2
+    failures=$((failures + 1))
+  fi
+}
+
+# ── Node ────────────────────────────────────────────────────────────────
+if [[ -f package.json ]]; then
+  pkg_runner=""
+  if [[ -f pnpm-lock.yaml ]] && command -v pnpm >/dev/null; then
+    pkg_runner="pnpm"
+  elif [[ -f yarn.lock ]] && command -v yarn >/dev/null; then
+    pkg_runner="yarn"
+  elif command -v npm >/dev/null; then
+    pkg_runner="npm run --silent"
+  fi
+
+  if [[ -n "$pkg_runner" ]]; then
+    has_script() { jq -e --arg s "$1" '.scripts[$s] // empty' package.json >/dev/null 2>&1; }
+    has_script lint        && run "node lint"        $pkg_runner lint
+    has_script typecheck   && run "node typecheck"   $pkg_runner typecheck
+    has_script "type-check" && run "node type-check" $pkg_runner "type-check"
+    has_script "format:check" && run "node format:check" $pkg_runner "format:check"
+  fi
+fi
+
+# ── Python ──────────────────────────────────────────────────────────────
+if [[ -f pyproject.toml || -f setup.py || -f requirements.txt ]]; then
+  if command -v ruff >/dev/null; then
+    run "ruff check"  ruff check .
+    run "ruff format --check" ruff format --check .
+  elif command -v flake8 >/dev/null; then
+    run "flake8" flake8 .
+  fi
+
+  if [[ -f mypy.ini || -f .mypy.ini ]] || jq -e '.tool.mypy // empty' pyproject.toml >/dev/null 2>&1; then
+    if command -v mypy >/dev/null; then
+      run "mypy" mypy .
+    fi
+  fi
+
+  if [[ -f pyrightconfig.json ]] && command -v pyright >/dev/null; then
+    run "pyright" pyright
+  fi
+fi
+
+# ── Go ──────────────────────────────────────────────────────────────────
+if [[ -f go.mod ]]; then
+  command -v go >/dev/null && run "go vet" go vet ./...
+  command -v staticcheck >/dev/null && run "staticcheck" staticcheck ./...
+fi
+
+# ── Rust ────────────────────────────────────────────────────────────────
+if [[ -f Cargo.toml ]] && command -v cargo >/dev/null; then
+  run "cargo fmt --check" cargo fmt --check
+  run "cargo clippy"     cargo clippy --all-targets -- -D warnings
+fi
+
+if (( ran_anything == 0 )); then
+  exit 0   # nothing applicable; never block.
+fi
+
+if (( failures > 0 )); then
+  echo >&2
+  echo "✗ pre-commit: $failures check(s) failed. Fix and re-stage, or run with MAESTRO_SKIP_HOOKS=1 to bypass." >&2
+  exit 1
+fi
+
+echo "✓ pre-commit: all checks passed" >&2
+exit 0

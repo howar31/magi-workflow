@@ -6,9 +6,7 @@
 
 ## 現在進度
 
-✅ **Phase A + B + C + D 完成**：orchestrator 底層 + 6 個核心 slash command + 4 個 web 領域 skill + 2 個 subagent。完整路線見 [`SPEC.md`](SPEC.md)。
-
-目前已可用：
+✅ **Phase A–E 全數完成**。Plugin 已 feature-complete，可直接使用。完整路線見 [`SPEC.md`](SPEC.md)。
 
 **核心**
 - 多 CLI 並行 fan-out（claude / gemini / codex），事件流協定、quota / auth 自動降級
@@ -17,7 +15,7 @@
 - 2 個 subagent：`maestro-developer`（Sonnet, TDD 實作）、`maestro-reviewer`（Opus, 唯讀審查）
 - nvm 相容（避開 `#!/usr/bin/env node` 找錯版本的坑）
 
-**Web 領域 add-ons（Phase D）**
+**Web 領域 add-ons**
 - `/maestro.web.frontend.spec` — 元件樹、a11y checklist、Playwright e2e 計畫
 - `/maestro.web.backend.spec` — OpenAPI / SDL 契約、migration、authz 矩陣、contract test
 - `/maestro.web.infra.plan` — Terraform plan dry-run、IAM diff、Infracost、rollback
@@ -26,8 +24,9 @@
 **Override flags**
 - `--model` / `--magi` / `--reviewers` / `--single` / `--parallel` / `--diff` / `--workdir` / `--milestone` / `--task` / `--reset` / `--recheck`
 
-尚未可用：
-- 團隊化 hooks 與 canonical AGENTS.md（Phase E）
+**團隊化選配**
+- `references/AGENTS.md`：跨專案守則的 single source of truth（model routing、coding standards、Conventional Commits、tool preferences、ask-vs-act、SSOT 紀律）
+- `hooks/`：可選 git hooks（commit-msg 強制 Conventional Commits、pre-commit 自動跑 lint/typecheck、pre-push WIP 警示），含 `install.sh` 一鍵安裝
 
 ## 安裝
 
@@ -84,6 +83,24 @@ cd /opt/projects/maestro-workflow
 ```
 
 每一步都會在使用者面前停下來，等你說「OK 繼續」。Plugin 不會偷偷 commit / push、不會 apply infra、不會 trigger deploy。
+
+## 選配：團隊 Git Hooks
+
+```bash
+# 在你想啟用的專案裡：
+bash /opt/projects/maestro-workflow/hooks/install.sh
+
+# 或是手動 copy：
+cp /opt/projects/maestro-workflow/hooks/{commit-msg,pre-commit,pre-push} .git/hooks/
+chmod +x .git/hooks/{commit-msg,pre-commit,pre-push}
+```
+
+這會啟用：
+- `commit-msg` — 強制 Conventional Commits 格式
+- `pre-commit` — 自動偵測並執行專案的 lint / typecheck（pnpm/npm/ruff/mypy/go vet/cargo clippy）
+- `pre-push` — WIP / FIXME 警示（不阻擋）
+
+緊急 bypass：`MAESTRO_SKIP_HOOKS=1 git commit ...`
 
 ### 環境需求
 

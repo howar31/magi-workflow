@@ -6,14 +6,13 @@ Project-wide instructions for AI agents working in this repo.
 A Claude Code plugin that orchestrates multi-model code/plan reviews via parallel CLI fan-out plus MAGI weighted voting. Architecture and full feature spec live in [SPEC.md](SPEC.md).
 
 ## Status
-Phases A + B + C + D complete:
+All five phases (A–E) complete. The plugin is feature-complete relative to the original SPEC.
 
 - **Phase A** — orchestrator + three adapters (claude/gemini/codex) + MAGI consensus report builder.
 - **Phase B** — six core slash commands and override flags.
 - **Phase C** — two subagents (`maestro-developer` Sonnet, `maestro-reviewer` Opus).
 - **Phase D** — four web-domain skills + reference docs.
-
-Phase E (team-ready externalisation + hooks) is the only remaining piece — see [SPEC.md](SPEC.md).
+- **Phase E** — canonical `references/AGENTS.md`, optional git hooks (`commit-msg` Conventional Commits, `pre-commit` lint/typecheck auto-detect, `pre-push` WIP warning).
 
 ## Slash commands
 

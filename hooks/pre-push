@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# maestro-workflow pre-push hook
+# Warns when commits being pushed contain WIP / FIXME markers in their
+# subject lines. Does NOT block — surfaces for awareness.
+#
+# Skip with: MAESTRO_SKIP_HOOKS=1 git push ...
+
+set -uo pipefail
+
+if [[ "${MAESTRO_SKIP_HOOKS:-0}" == "1" ]]; then
+  exit 0
+fi
+
+# Read pushed refs from stdin: <local_ref> <local_sha> <remote_ref> <remote_sha>
+flagged=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [[ -z "$local_sha" || "$local_sha" == "0000000000000000000000000000000000000000" ]] && continue
+  if [[ "$remote_sha" == "0000000000000000000000000000000000000000" ]]; then
+    range="$local_sha"   # new branch
+  else
+    range="$remote_sha..$local_sha"
+  fi
+  while IFS=$'\t' read -r sha subject; do
+    [[ -z "$sha" ]] && continue
+    if [[ "$subject" == *"WIP"* || "$subject" == *"FIXME"* || "$subject" == *"fixup!"* ]]; then
+      echo "⚠ pre-push: ${sha:0:7} contains WIP/FIXME — $subject" >&2
+      flagged=1
+    fi
+  done < <(git log --format='%h%x09%s' "$range" 2>/dev/null)
+done
+
+if (( flagged == 1 )); then
+  echo >&2
+  echo "These commits look unfinished. Push anyway? Re-run with MAESTRO_SKIP_HOOKS=1 to suppress this warning." >&2
+  # Don't block — warn only.
+fi
+
+exit 0

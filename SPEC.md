@@ -22,7 +22,7 @@ A `/maestro.setup` wizard runs once at install time to inspect installed CLIs, w
 | B | Setup wizard + 6 core skills + override flags | ✅ done |
 | C | Subagents (`maestro-developer` / `maestro-reviewer`) | ✅ done (folded into Phase B) |
 | D | Web-domain skills (frontend / backend / infra / ci) + 4 reference docs | ✅ done |
-| E | Team-ready hooks + canonical AGENTS.md | ⏳ remaining |
+| E | Canonical `references/AGENTS.md` + optional git hooks | ✅ done |
 
 ## Slash commands (Phase B)
 
@@ -205,9 +205,34 @@ high-level SPEC) and `/maestro.tasks` (which decomposes into work
 units). They are independent — only invoke the ones a feature actually
 touches.
 
-## Out of scope (still pending)
+## Optional add-ons (Phase E)
 
-- **Phase E** — team-ready hooks (commit-msg Conventional Commits, pre-commit
-  lint), canonical `references/AGENTS.md` for cross-project conventions.
+### Canonical `references/AGENTS.md`
+
+A single-source-of-truth document the coordinator and subagents read for
+project-agnostic conventions: model routing, language-specific coding
+standards (TS / Python / Go / Bash), Conventional Commits format, tool
+preferences (pnpm / uv / rg / fd / jq), ask-vs-act guidance, SSOT
+discipline, output language rules, and failure-mode playbook. The user's
+own project-level `CLAUDE.md` always overrides this file.
+
+### Optional git hooks (`hooks/`)
+
+| Hook | Behaviour |
+|------|-----------|
+| `commit-msg` | Validates Conventional Commits format on the subject line. Rejects unprefixed / capitalised / trailing-period subjects. |
+| `pre-commit` | Auto-detects the project's lint / type-check / format-check commands (Node: pnpm/yarn/npm; Python: ruff/flake8/mypy/pyright; Go: vet/staticcheck; Rust: fmt/clippy) and runs them. Quiet on no-config; loud on failure. |
+| `pre-push` | Warns when commits being pushed contain `WIP` / `FIXME` / `fixup!` markers. Does **not** block. |
+
+All hooks are bash 3.2 compatible, support `MAESTRO_SKIP_HOOKS=1` for
+single-shot bypass, and ship with `hooks/install.sh` for one-line
+installation into `.git/hooks/` (or copy to `.githooks/` and use
+`core.hooksPath` for repo-tracked hooks).
+
+## Still out of scope
+
 - Plugin marketplace registration — repo is currently consumed via
   `claude plugin add github:howar31/maestro-workflow`.
+- Non-web domain skills (data engineering, ML, mobile, game). Architecture
+  is ready: add `skills/maestro.<domain>.<name>/` and
+  `references/domain/<domain>/`.
