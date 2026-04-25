@@ -507,9 +507,20 @@ installation into `.git/hooks/` (or copy to `.githooks/` and use
 
 ## Plugin distribution
 
-The repo ships its own `.claude-plugin/marketplace.json` and works as a
-**self-hosted single-plugin marketplace**. Users install via the standard
-Claude Code plugin commands:
+The plugin is installable via two equivalent paths.
+
+**Path A — Howar31 personal marketplace** (recommended for users who may
+also want other Howar31 plugins later):
+
+```bash
+claude plugin marketplace add howar31/howar31-marketplace
+claude plugin install magi-workflow@howar31
+```
+
+The marketplace lives at [howar31/howar31-marketplace](https://github.com/howar31/howar31-marketplace) and points at this repo via a `github` source.
+
+**Path B — Self-hosted single-plugin marketplace** (this repo carries its
+own `.claude-plugin/marketplace.json`):
 
 ```bash
 claude plugin marketplace add howar31/magi-workflow
@@ -518,7 +529,9 @@ claude plugin install magi-workflow@magi-workflow
 
 Or via slash commands inside a session: `/plugin marketplace add ...` +
 `/plugin install ...`. Auto-update is opt-in per marketplace via the
-`/plugin marketplace` UI.
+`/plugin marketplace` UI. Both paths install the same plugin from the
+same source — choice is purely about which marketplace registration the
+user prefers.
 
 ## Still out of scope
 

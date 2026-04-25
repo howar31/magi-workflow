@@ -29,16 +29,34 @@
 
 ## 安裝
 
-### 作為 Claude Code plugin（推薦）
+兩條路擇一，都是兩步。
 
-本 repo 自帶 `.claude-plugin/marketplace.json`，是個 single-plugin self-hosted marketplace。兩步：
+### 路徑 A：透過 Howar31 personal marketplace（推薦）
+
+註冊一次 marketplace，未來其他 Howar31 出的 plugin 自動可見：
 
 ```bash
-claude plugin marketplace add howar31/magi-workflow      # 註冊 marketplace
-claude plugin install magi-workflow@magi-workflow        # 安裝 plugin
+claude plugin marketplace add howar31/howar31-marketplace
+claude plugin install magi-workflow@howar31
 ```
 
 或在 Claude Code session 裡用 slash command：
+
+```
+/plugin marketplace add howar31/howar31-marketplace
+/plugin install magi-workflow@howar31
+```
+
+### 路徑 B：直接從本 repo 安裝（self-hosted single-plugin marketplace）
+
+本 repo 自帶 `.claude-plugin/marketplace.json`，本身就是個 single-plugin marketplace。如果你只想要 magi-workflow、不想看到別的 Howar31 plugin，走這條：
+
+```bash
+claude plugin marketplace add howar31/magi-workflow
+claude plugin install magi-workflow@magi-workflow
+```
+
+或：
 
 ```
 /plugin marketplace add howar31/magi-workflow
@@ -394,9 +412,11 @@ Suggested: make some changes or stage them first
 
 ## 升級與移除
 
+把下方範例的 `<marketplace>` 替換成你當初註冊的 marketplace 名稱：路徑 A 用 `howar31`、路徑 B 用 `magi-workflow`。
+
 ```bash
 # 拉最新 marketplace 內容
-claude plugin marketplace update magi-workflow
+claude plugin marketplace update <marketplace>
 
 # 升級 plugin 到最新版
 claude plugin update magi-workflow
@@ -408,10 +428,10 @@ claude plugin update magi-workflow
 claude plugin uninstall magi-workflow
 
 # 連 marketplace 一起移除
-claude plugin marketplace remove magi-workflow
+claude plugin marketplace remove <marketplace>
 ```
 
-> 預設不會自動更新；要 marketplace 啟動時自動拉新版，在 Claude Code 內跑 `/plugin marketplace`，找到 magi-workflow 把 auto-update 開起來，更新後它會提示 `/reload-plugins`。
+> 預設不會自動更新；要 marketplace 啟動時自動拉新版，在 Claude Code 內跑 `/plugin marketplace`，找到對應 marketplace 把 auto-update 開起來，更新後它會提示 `/reload-plugins`。
 
 config 在 `~/.config/magi-workflow/config.json`，移除 plugin 不會自動刪 config — 想完全清乾淨手動 `rm -rf ~/.config/magi-workflow/`。
 
