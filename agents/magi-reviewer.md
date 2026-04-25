@@ -41,6 +41,22 @@ For each changed file:
 
 For each new file: read it end-to-end and ask "does this need to exist?"
 
+## Drift from contract (when a sprint context is provided)
+
+If the coordinator's brief includes a `## Acceptance criteria` or full
+`PLAN.md` / `SPEC.md` from `docs/<num>-<slug>/`, you must additionally
+compare the diff against that contract and classify any deviations:
+
+| Class | Definition | Examples |
+|-------|-----------|----------|
+| **A. Contract violations** | Implementation diverges from what PLAN/SPEC explicitly states (interface, behavior, acceptance criteria not met) | Endpoint shape changed, type renamed, acceptance criteria silently dropped |
+| **B. Below-the-contract decisions** | PLAN/SPEC was silent; implementation chose freely | Retry strategy, helper naming, internal data shape |
+| **C. Out-of-scope observations** | New concerns / risks / opportunities surfaced during implementation but not in PLAN/SPEC | "Should we also rate-limit /api/profile?", performance follow-up |
+
+A class is the most serious — it means the contract is wrong or was not
+honored, and PLAN/SPEC needs review. B class is normal latitude. C class
+becomes backlog material.
+
 ## What you look for
 
 | Category | Examples |
@@ -80,6 +96,23 @@ One paragraph rationale.
 
 ## Untested paths
 - <path/function> — no test exercises this behavior.
+
+## Drift from contract
+(Include this section only when a PLAN.md / SPEC.md was provided.)
+
+### A. Contract violations
+- **<short subject>** — `<file>:<line>`
+  What the contract says vs. what the code does.
+  Proposed PLAN/SPEC update: <one sentence>.
+
+### B. Below-the-contract decisions
+- <description> — files: `<paths>`
+
+### C. Out-of-scope observations
+- <description>
+
+If no deviations in a category, write `(none)` instead of leaving the
+section blank.
 
 ## Out-of-scope observations (not blocking)
 - ...

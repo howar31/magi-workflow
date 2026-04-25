@@ -70,11 +70,17 @@ You are dispatched to review this change set.
 - TECHSTACK.md: <verbatim or summary>
 - Conventions: CLAUDE.md / AGENTS.md (root)
 
+## Sprint contract (if a sprint context exists)
+<verbatim PLAN.md and/or SPEC.md from docs/<num>-<slug>/>
+
 ## Acceptance criteria (if applicable)
 <from current sprint's SPEC.md if exists>
 
 ## Output protocol
 Follow your standard structure: Verdict + 🔴 / 🟡 / 🟢 sections.
+If a sprint contract was provided above, additionally output a
+`## Drift from contract` section with A / B / C classes per your agent
+spec.
 ```
 
 Use Task tool with `subagent_type: magi-reviewer` (or `--model` override).
@@ -98,6 +104,9 @@ You are reviewing a software change. Apply skepticism and domain expertise.
 ## Project conventions
 <from CLAUDE.md / AGENTS.md / TECHSTACK.md>
 
+## Sprint contract (if a sprint context exists)
+<verbatim PLAN.md and/or SPEC.md from docs/<num>-<slug>/>
+
 ## Acceptance criteria
 <from sprint SPEC.md if applicable>
 
@@ -115,6 +124,29 @@ End with:
   ## Verdict
   APPROVE | APPROVE-WITH-NITS | REQUEST-CHANGES
   <one paragraph>
+
+If a sprint contract was provided above, additionally output a
+`## Drift from contract` section classifying any deviations:
+
+  ## Drift from contract
+
+  ### A. Contract violations
+  - <subject> — files: <paths>
+    What the contract says vs. what the code does.
+    Proposed PLAN/SPEC update: <one sentence>.
+  (or "(none)" if no contract violations)
+
+  ### B. Below-the-contract decisions
+  - <description>
+  (or "(none)")
+
+  ### C. Out-of-scope observations
+  - <description>
+  (or "(none)")
+
+A = code does something the contract did not authorize or contradicts.
+B = code chose freely where the contract was silent.
+C = new concerns that surfaced during implementation, not in the contract.
 
 Do not edit files.
 ```
@@ -182,15 +214,64 @@ omits the MAGI-specific sections (mode/weights/etc.).
 
 Summarise top concerns in chat: 3 most critical issues + verdict.
 
+## 3.5. Write DRIFT.md (when a sprint context exists)
+
+If a sprint folder was identified and the reviewer prompt included a sprint
+contract, **always** write `<sprint_dir>/DRIFT.md` regardless of whether
+deviations were found. The file's existence signals "review was run"; the
+`Status` field signals "was there drift?".
+
+Apply MAGI semantic dedup + voting to the `## Drift from contract`
+sections of every successful reviewer (same procedure as code-review issues).
+Only adopt items that meet the configured threshold; below-threshold drift
+items are dropped (avoid single-reviewer over-flagging).
+
+For `--single` mode, take the `## Drift from contract` section verbatim
+from the reviewer's output; no voting needed.
+
+Schema:
+
+```markdown
+# Drift — <feature>
+> Source: magi-report.md (or single reviewer)  •  Generated: <ISO 8601>  •  Status: NONE | DETECTED
+
+## A. Contract violations
+(none)
+<or>
+- [ ] <description> — files: `<paths>`
+  Proposed PLAN/SPEC update: <one sentence>
+
+## B. Below-the-contract decisions
+(none)
+<or>
+- [ ] <description>
+
+## C. Out-of-scope observations
+(none)
+<or>
+- [ ] <description>
+```
+
+`Status: NONE` when all three sections are `(none)`. `Status: DETECTED`
+otherwise. The status field is the canonical signal `/magi.commit` reads.
+
+DRIFT.md is overwritten on every `/magi.review-code` run (current-state
+semantics). Historical record stays in WORKS.md.
+
 ## 4. Hand-off
 
-If verdict = APPROVE: tell user it's safe to commit.
+If verdict = APPROVE: tell user it's safe to commit. Recommend
+`/magi.commit` (sprint mode if DRIFT.md was produced — it will pick up
+DRIFT.md automatically).
 
 If verdict = APPROVE-WITH-NITS: list nits and ask user whether to address
-before commit (or note they can defer).
+before commit (or note they can defer). Then `/magi.commit`.
 
 If verdict = REQUEST-CHANGES: enumerate critical issues and recommend
 `/magi.work --task <id>` (or manual edit) to address. Do not commit.
+
+If DRIFT.md status = DETECTED, also tell the user the count of A / B / C
+items so they know what `/magi.commit` will prompt them to handle.
 
 **Never commit, never push, never auto-fix.** The user is the gate.
 

@@ -8,7 +8,9 @@
 
 - **多 CLI 並行審議** — `claude` / `gemini` / `codex` 在同一道閘門平行 fan-out，事件流協定 + quota / auth 自動降級
 - **MAGI 加權投票** — 4 種模式（majority / supermajority / unanimous / threshold）；reviewer 失敗時退化模式透明標示
-- **領域中性** — 核心 6 個 slash command（plan / tasks / review-plan / work / review-code / setup）不綁特定技術棧
+- **契約即真理 + 自動 drift 偵測** — `/magi.plan` 寫的 PLAN/SPEC 是凍結契約；`/magi.review-code` 自動比對 code 與契約，輸出 `DRIFT.md`（A 類違反 / B 類自由 / C 類觀察）；`/magi.commit` sprint mode 引導使用者把 A 類回填、C 類升級到 `docs/BACKLOG.md`
+- **雙模式 commit** — `/magi.commit` 自動偵測 sprint context；feature work 走 sprint mode、chore/docs/小 fix 走 standalone mode，單一指令通吃所有 commit 情境
+- **領域中性** — 核心 slash command（init / plan / tasks / review-plan / work / review-code / commit / setup）不綁特定技術棧
 - **Web 領域 add-ons** — frontend / backend / infra / ci 四個專用 spec skill，補強標準 SPEC.md
 - **零自動副作用** — 不偷偷 commit / push、不 apply infra、不 trigger deploy；每一步都會停下等使用者確認
 - **nvm 相容** — 避開 `#!/usr/bin/env node` 找錯版本的坑（macOS 常踩）
@@ -42,6 +44,14 @@ claude plugin install magi-workflow@magi-workflow        # 安裝 plugin
 
 它會檢查你機器上的 `claude` / `gemini` / `codex`、詢問你想啟用哪幾位 reviewer 與權重、寫入 `~/.config/magi-workflow/config.json`，最後跑一次 dry-run 驗證。
 
+新專案第一次採用 magi-workflow 時跑：
+
+```
+/magi.init
+```
+
+會偵測缺哪些專案文件（root `CLAUDE.md` / `README.md` / `SPEC.md`、`docs/PRD.md` / `docs/TECHSTACK.md` / `docs/BACKLOG.md`）並逐項問你要不要建立 scaffold。idempotent；既有檔案絕不覆寫。
+
 ### 作為本機開發 / 直接跑 shell scripts
 
 ```bash
@@ -73,13 +83,17 @@ cd /opt/projects/magi-workflow
 ### 通用流程
 
 ```
-/magi.setup                        # 第一次先跑這個
+/magi.setup                        # 第一次先跑這個（global，per-user）
+/magi.init                         # 新專案第一次跑這個（per-project bootstrap）
+
 /magi.plan "<功能描述>"            # 產出 docs/<num>-<slug>/PLAN.md 或 SPEC.md（依複雜度自動判斷）
+                                   # 或乾跑 /magi.plan 從 docs/BACKLOG.md 挑待 promote 項目
 /magi.review-plan                  # 多 CLI MAGI 審 plan
 /magi.tasks                        # 拆 TASKS.md
 /magi.work                         # 派工 magi-developer 實作
-/magi.review-code                  # 多 CLI MAGI 審 code（--single 退化單審）
-                                   # 確認沒問題後手動 commit
+/magi.review-code                  # 多 CLI MAGI 審 code 並自動產出 DRIFT.md（--single 退化單審）
+/magi.commit                       # sprint mode：A 類回填 PLAN/SPEC、C 類升級到 BACKLOG、可選 root 同步、conventional commits
+                                   # standalone mode：chore/docs/小 fix 直接 commit（無 sprint context 時自動切換）
 ```
 
 ### Web 領域進階流程（在 `/magi.plan` 與 `/magi.tasks` 之間插入）
@@ -159,9 +173,20 @@ flowchart TD
         R2x --> Consensus2
     end
 
-    Consensus2 --> Verdict{採納 critical?}
+    Consensus2 --> Drift["產出 DRIFT.md<br/>(Status: NONE / DETECTED)"]
+    Drift --> Verdict{採納 critical?}
     Verdict -- 需修正 --> Work
-    Verdict -- 通過 --> Commit([使用者確認 → commit])
+    Verdict -- 通過 --> CommitCmd["/magi.commit"]
+
+    subgraph CommitPhase["📦 Commit 階段"]
+        CommitCmd --> CommitMode{Sprint context?}
+        CommitMode -- 是 --> SprintMode["Sprint mode<br/>A 類回填 + C 類→BACKLOG<br/>+ root sync detect"]
+        CommitMode -- 否 --> StandaloneMode["Standalone mode<br/>(chore / docs / 小 fix)<br/>+ root sync detect"]
+        SprintMode --> ConfirmCommit([使用者確認 message])
+        StandaloneMode --> ConfirmCommit
+    end
+
+    ConfirmCommit --> Done([git commit])
 ```
 
 > 圖中三家 reviewer 是預設配置（claude / gemini / codex）；實際啟用哪幾家、權重多少、required 與否，由 `~/.config/magi-workflow/config.json` 控制。
@@ -204,8 +229,8 @@ flowchart LR
 |------|------|------|------|
 | **Coordinator**（main agent） | Opus（你的 Claude Code session） | 規劃、派工、驗收、文件同步、MAGI 投票收斂 | 不寫 production code |
 | **`magi-developer`** subagent | Sonnet | TDD 實作（紅 → 綠 → 重構）、產出 DONE / BLOCKED 報告 | 不做架構決策、不擴大範圍、不 commit |
-| **`magi-reviewer`** subagent | Opus | 防禦性 code review（`--single` 模式輸出 `SINGLE_CODE_REVIEW.md`，或 MAGI 退化時使用） | 不修改檔案 |
-| **外部 CLI**（claude / gemini / codex） | 各家旗艦推理模型 | 多模型並行 review（plan + code 兩道閘門），輸出 `MAGI_PLAN_REVIEW.md` / `MAGI_CODE_REVIEW.md` | 各自獨立、不互相影響、coordinator 用加權投票收斂 |
+| **`magi-reviewer`** subagent | Opus | 防禦性 code review（`--single` 模式輸出 `SINGLE_CODE_REVIEW.md`，或 MAGI 退化時使用）+ drift detection（A/B/C 分類）寫進 `DRIFT.md` | 不修改檔案 |
+| **外部 CLI**（claude / gemini / codex） | 各家旗艦推理模型 | 多模型並行 review（plan + code 兩道閘門），輸出 `MAGI_PLAN_REVIEW.md` / `MAGI_CODE_REVIEW.md` / `DRIFT.md` | 各自獨立、不互相影響、coordinator 用加權投票收斂 |
 
 ### 為什麼選這組 model mix？
 
@@ -313,7 +338,25 @@ chmod +x .git/hooks/{commit-msg,pre-commit,pre-push}
 
 ### 輸出檔位置
 
-所有 SSOT 文件統一放在 `docs/<num>-<slug>/`：
+依 **Project document tiers** 三層歸屬：
+
+**Tier 1 — Root**（高頻入口參考；`/magi.init` 一次建立、`/magi.commit` 持續同步）
+
+| 檔案 | 角色 |
+|------|------|
+| `CLAUDE.md` | AI agent 索引 |
+| `README.md` | human-readable 說明 |
+| `SPEC.md` | architecture spec |
+
+**Tier 2 — `docs/`**（流程支援檔；`/magi.init` 建空骨架）
+
+| 檔案 | 角色 |
+|------|------|
+| `docs/PRD.md` | 產品需求 |
+| `docs/TECHSTACK.md` | 技術棧約束 |
+| `docs/BACKLOG.md` | 待 promote 項目（`/magi.commit` 寫入；`/magi.plan` 乾跑時讀取） |
+
+**Tier 3 — `docs/<num>-<slug>/`**（per-feature；`/magi.plan` 建立、sprint 結束凍結）
 
 | 指令 | 輸出 |
 |------|------|
@@ -321,8 +364,8 @@ chmod +x .git/hooks/{commit-msg,pre-commit,pre-push}
 | `/magi.tasks` | `TASKS.md` |
 | `/magi.work` | `WORKS.md` |
 | `/magi.review-plan` | `MAGI_PLAN_REVIEW.md` |
-| `/magi.review-code`（MAGI） | `MAGI_CODE_REVIEW.md` |
-| `/magi.review-code --single` | `SINGLE_CODE_REVIEW.md` |
+| `/magi.review-code`（MAGI） | `MAGI_CODE_REVIEW.md` + `DRIFT.md`（一律產出，`Status: NONE`/`DETECTED`） |
+| `/magi.review-code --single` | `SINGLE_CODE_REVIEW.md` + `DRIFT.md` |
 | `/magi.web.infra.plan` | `INFRA.md`（含 `plan.tfplan` / `plan.json`） |
 | `/magi.web.ci.spec` | `CI.md` + draft workflow YAML |
 

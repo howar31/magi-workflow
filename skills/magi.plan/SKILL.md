@@ -1,6 +1,6 @@
 ---
 name: magi.plan
-description: Draft a structured plan (PLAN.md) or spec (SPEC.md) for a new feature, in docs/<num>-<name>/, then pause for user confirmation. The coordinator uses Opus-class reasoning. Reads existing PRD.md / TECHSTACK.md if they exist at docs/. Argument is a free-text feature description; e.g., /magi.plan "add user profile page".
+description: Draft a structured plan (PLAN.md) or spec (SPEC.md) for a new feature, in docs/<num>-<name>/, then pause for user confirmation. The coordinator uses Opus-class reasoning. Reads existing PRD.md / TECHSTACK.md / BACKLOG.md if they exist at docs/. With no description argument, lists pending backlog items as candidates. Argument is a free-text feature description; e.g., /magi.plan "add user profile page".
 disable-model-invocation: true
 ---
 
@@ -19,6 +19,49 @@ USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
 If `$USER_CONFIG` is missing, tell the user to run `/magi.setup` first.
+
+## 0.5. Backlog awareness (only when no description argument was given)
+
+If the user invoked `/magi.plan` **without** a description argument (and
+without an explicit slug+description form), check for `docs/BACKLOG.md`:
+
+```bash
+[[ -f docs/BACKLOG.md ]] && pending=$(awk '/^## Pending/{flag=1;next} /^## /{flag=0} flag && /^- \[ \]/' docs/BACKLOG.md)
+```
+
+If `## Pending` has any entries:
+
+1. List them numbered to the user, with their source sprint:
+   ```
+   Backlog 有 N 項待 promote：
+     1. <description>  [from docs/03-foo/DRIFT.md]
+     2. <description>  [from docs/04-bar/DRIFT.md]
+     ...
+
+   選一項當下個 sprint 起點？(輸入編號 / 輸入新 description / Enter 跳過 backlog)
+   ```
+
+2. Branch on user input:
+   - **Number** → take that entry's description as the seed for this
+     sprint. Continue with §1 below using that description. **After §4
+     finishes writing the sprint folder**, edit `docs/BACKLOG.md`:
+     - Remove the line from `## Pending`
+     - Add to `## Promoted to sprints` (create the section if missing) as:
+       ```markdown
+       - ~~<description>~~ → `docs/<num>-<slug>/` (<YYYY-MM-DD>)
+       ```
+   - **Free text** → treat as a normal description argument; **leave
+     BACKLOG.md untouched**.
+   - **Empty (Enter)** → exit; don't create a sprint. Tell the user "no
+     sprint started; backlog left as-is".
+
+If `docs/BACKLOG.md` doesn't exist or `## Pending` is empty, fall through
+to "what would you like to plan?" — same as no-arg behavior before this
+upgrade.
+
+If the user invoked `/magi.plan "<description>"` with an argument, **skip
+this entire section** — don't even read BACKLOG.md. The argument is the
+authoritative starting point.
 
 ## 1. Resolve the sprint folder
 
@@ -117,6 +160,17 @@ mkdir -p "docs/<num>-<slug>"
 # Write PLAN.md or SPEC.md
 ```
 
+If this sprint was started by **picking a backlog entry** in §0.5, after
+the sprint folder is created, also update `docs/BACKLOG.md`:
+
+- Remove the chosen entry's line (and its `> from ...` source line) from
+  `## Pending`
+- Append under `## Promoted to sprints` (create the section if it doesn't
+  exist):
+  ```markdown
+  - ~~<original description>~~ → `docs/<num>-<slug>/` (<YYYY-MM-DD>)
+  ```
+
 After writing, **stop and ask the user to confirm**. Do not auto-trigger
 `/magi.review-plan`. The user is the gate.
 
@@ -163,7 +217,15 @@ When the user confirms the document:
 
 ## Argument parsing
 
-The command form: `/magi.plan [slug] "<description>"`.
+The command form:
+- `/magi.plan` (no args) — backlog-aware mode (see §0.5). Lists `## Pending`
+  entries from `docs/BACKLOG.md`; user picks one or types a new
+  description.
+- `/magi.plan "<description>"` — direct mode. Plans the described feature;
+  **does not read or modify BACKLOG.md**.
+- `/magi.plan <slug> "<description>"` — direct mode with explicit slug.
+
+Flags:
 
 - `--model <name>` — override Coordinator model for this invocation
   (rarely needed; main session model is the default).

@@ -23,11 +23,13 @@ Every command is `disable-model-invocation: true` — it only runs when the user
 | Command | Role | Pauses for user? |
 |---------|------|-------------------|
 | `/magi.setup` | First-run onboarding: healthcheck CLIs, write `~/.config/magi-workflow/config.json`, dry-run | yes (interactive) |
-| `/magi.plan` | Coordinator drafts PLAN.md / SPEC.md in `docs/<num>-<slug>/`; after confirmation, scans the doc + TECHSTACK.md for web-domain keywords and offers `/magi.web.<x>.spec` add-ons | yes (confirm doc) |
+| `/magi.init` | One-time project bootstrap: scaffolds missing root CLAUDE/README/SPEC + docs/PRD/TECHSTACK/BACKLOG. Idempotent | yes (per-file confirm) |
+| `/magi.plan` | Coordinator drafts PLAN.md / SPEC.md in `docs/<num>-<slug>/`. Bare invocation reads `docs/BACKLOG.md` Pending entries and offers them as candidates. With description argument, plans directly | yes (confirm doc) |
 | `/magi.tasks` | Coordinator decomposes PLAN/SPEC into TASKS.md milestones + checklists | yes (confirm tasks) |
 | `/magi.review-plan` | Multi-CLI MAGI review of PLAN/SPEC; outputs `MAGI_PLAN_REVIEW.md` | yes (verdict to user) |
 | `/magi.work` | Dispatches `magi-developer` (Sonnet) per task; updates WORKS.md | yes (before commit) |
-| `/magi.review-code` | Default multi-CLI MAGI on git diff; `--single` falls back to `magi-reviewer` (Opus) | yes (verdict to user) |
+| `/magi.review-code` | Multi-CLI MAGI on git diff (default); `--single` falls back to `magi-reviewer` (Opus). Always produces `<sprint>/DRIFT.md` with `Status: NONE`/`DETECTED` when a sprint context exists | yes (verdict to user) |
+| `/magi.commit` | Stage + commit. Sprint mode: A-class drift backfill into PLAN/SPEC, C-class promotion to `docs/BACKLOG.md`, optional root-doc sync, Conventional Commits. Standalone mode (no sprint context) for chore/docs/small fixes | yes (confirm message) |
 
 ### Web-domain elaborations (run between `/magi.plan` and `/magi.tasks`)
 
@@ -41,7 +43,31 @@ Every command is `disable-model-invocation: true` — it only runs when the user
 ## Subagents
 
 - **`magi-developer`** (`model: sonnet`) — TDD-first implementation worker. Read/Write/Edit/Bash/Grep/Glob. Reports `DONE: <summary>` or `BLOCKED: <reason>`. Does not make architecture decisions and does not commit.
-- **`magi-reviewer`** (`model: opus`) — Defensive code reviewer. Read/Grep/Glob/Bash (read-only). Outputs structured Critical / Important / Note. Never edits files.
+- **`magi-reviewer`** (`model: opus`) — Defensive code reviewer. Read/Grep/Glob/Bash (read-only). Outputs structured Critical / Important / Note plus `Drift from contract` (A/B/C classes) when a sprint contract is provided. Never edits files.
+
+## Project document tiers
+
+magi-workflow's project documents are organized into three tiers by reading frequency:
+
+| Tier | Location | Role | Files |
+|------|----------|------|-------|
+| **1: Entry / primary reference** | Root | First-eye contact for humans (GitHub) and AI agents (Anthropic convention); high-frequency reads | `README.md`, `CLAUDE.md`, `SPEC.md` |
+| **2: Process / secondary reference** | `docs/` | Consulted when context is needed; low-frequency reads | `PRD.md`, `TECHSTACK.md`, `BACKLOG.md` |
+| **3: Sprint scope** | `docs/<num>-<slug>/` | per-feature; written by `/magi.plan`, frozen at sprint end | `PLAN.md`, `SPEC.md`, `TASKS.md`, `WORKS.md`, `DRIFT.md` |
+
+Decision rule: "Want to see it on first opening the repo?" Yes → Tier 1. "Reference when needed?" → Tier 2. "Tied to a single feature?" → Tier 3.
+
+`/magi.init` bootstraps Tier 1 + Tier 2 (creates only what's missing). `/magi.plan` creates Tier 3 per sprint. `/magi.commit` keeps Tier 1 in sync when project-level changes warrant it (heuristic-detected, user-gated).
+
+## Scope boundaries (commit tools)
+
+magi-workflow is **self-contained**: it does not depend on any external commit skill. `/magi.commit` handles the entire commit + doc-sync flow for both sprint and standalone scenarios.
+
+If a user happens to also have a personal `~/.claude/skills/commit/` skill, the two coexist:
+- `/magi.commit` — commits within a magi-workflow project (sprint or standalone)
+- A personal `/commit` skill — commits in projects that don't use magi-workflow at all
+
+The user can choose to keep both, or retire the personal skill once `/magi.commit` is preferred. magi-workflow makes no assumption either way.
 
 ## Run / test commands
 
@@ -76,7 +102,7 @@ Every command is `disable-model-invocation: true` — it only runs when the user
 
 ### File naming
 
-- SSOT documents produced **inside user projects** are uppercase: `PLAN.md`, `SPEC.md`, `TASKS.md`, `WORKS.md` (one bundle per `docs/<num>-<name>/`).
+- SSOT documents produced **inside user projects** are uppercase: `PLAN.md`, `SPEC.md`, `TASKS.md`, `WORKS.md`, `DRIFT.md` (one bundle per `docs/<num>-<name>/`); `PRD.md`, `TECHSTACK.md`, `BACKLOG.md` (project-level under `docs/`).
 - Plugin internals follow normal kebab-case for shell scripts and `<name>.md` for skill / agent definitions.
 
 ## Adapter contract (when adding a new CLI)
