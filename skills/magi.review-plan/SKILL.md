@@ -1,10 +1,10 @@
 ---
-name: maestro.review-plan
-description: Run a multi-CLI MAGI review of a sprint's PLAN.md / SPEC.md. Spawns reviewers in parallel via the orchestrator, then applies semantic dedup + weighted voting per references/MAGI_VOTING.md. Default reviewers and voting mode come from ~/.config/maestro-workflow/config.json. Override with --reviewers and --magi.
+name: magi.review-plan
+description: Run a multi-CLI MAGI review of a sprint's PLAN.md / SPEC.md. Spawns reviewers in parallel via the orchestrator, then applies semantic dedup + weighted voting per references/MAGI_VOTING.md. Default reviewers and voting mode come from ~/.config/magi-workflow/config.json. Override with --reviewers and --magi.
 disable-model-invocation: true
 ---
 
-# /maestro.review-plan — MAGI plan review
+# /magi.review-plan — MAGI plan review
 
 You are the coordinator. Have N CLIs review the user's PLAN/SPEC in parallel,
 then consolidate their findings using MAGI weighted voting.
@@ -14,20 +14,20 @@ then consolidate their findings using MAGI weighted voting.
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
 Run a lightweight preflight; if `$USER_CONFIG` missing or empty
-`xreview.reviewers`, tell the user to run `/maestro.setup`.
+`xreview.reviewers`, tell the user to run `/magi.setup`.
 
 Read `references/MAGI_VOTING.md` (in the plugin root) for the consensus
 rules. You will follow Steps 1–8 of that document.
 
 ## 1. Locate the document
 
-Find the sprint folder (same logic as `/maestro.tasks`). Read its `PLAN.md`
+Find the sprint folder (same logic as `/magi.tasks`). Read its `PLAN.md`
 or `SPEC.md`. If neither exists, abort and tell the user to run
-`/maestro.plan` first.
+`/magi.plan` first.
 
 ## 2. Build the reviewer prompt
 
@@ -77,9 +77,9 @@ Do not produce any other output sections. Do not edit files.
 ## 4. Invoke the orchestrator
 
 ```bash
-WORKDIR=$(mktemp -d -t maestro-review.XXXXXX)
-MAESTRO_REVIEW_WORKDIR="$WORKDIR" \
-  "$PLUGIN_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh" \
+WORKDIR=$(mktemp -d -t magi-review.XXXXXX)
+MAGI_REVIEW_WORKDIR="$WORKDIR" \
+  "$PLUGIN_ROOT/skills/magi.review-plan/scripts/orchestrator.sh" \
   "$prompt_file" \
   $reviewer_args   # optional <cli:model> ... from --reviewers
 ```
@@ -151,11 +151,11 @@ Then summarise to the user in chat: top 3 adopted issues + verdict.
 
 ## 8. Hand-off
 
-If verdict = APPROVE: suggest `/maestro.tasks` (if not yet done) or
-`/maestro.work`.
+If verdict = APPROVE: suggest `/magi.tasks` (if not yet done) or
+`/magi.work`.
 
 If verdict ≠ APPROVE: suggest the user revise PLAN.md and re-run
-`/maestro.review-plan`.
+`/magi.review-plan`.
 
 Do not auto-trigger anything.
 

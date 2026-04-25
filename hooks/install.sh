@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install maestro-workflow git hooks into a target repo.
+# Install magi-workflow git hooks into a target repo.
 # Usage:
 #   bash install.sh                     # current repo
 #   bash install.sh /path/to/repo
@@ -32,4 +32,4 @@ for hook in commit-msg pre-commit pre-push; do
 done
 
 echo
-echo "Done. Bypass any time with: MAESTRO_SKIP_HOOKS=1 git <command>"
+echo "Done. Bypass any time with: MAGI_SKIP_HOOKS=1 git <command>"

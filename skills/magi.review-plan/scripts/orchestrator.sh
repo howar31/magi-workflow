@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Maestro xreview orchestrator.
+# Magi xreview orchestrator.
 #
 # Spawns N reviewer adapters in parallel, emits an event stream on stdout,
 # writes per-reviewer log + final files into a workdir, and applies the
@@ -85,7 +85,7 @@ fi
 (( ${#REVIEWERS[@]} == 0 )) && { echo "no reviewers configured" >&2; exit 3; }
 
 # ── Workdir ────────────────────────────────────────────────────────────────
-WORKDIR="${MAESTRO_REVIEW_WORKDIR:-$(mktemp -d -t maestro-review.XXXXXX)}"
+WORKDIR="${MAGI_REVIEW_WORKDIR:-$(mktemp -d -t magi-review.XXXXXX)}"
 mkdir -p "$WORKDIR"
 EVENTS_LOG="$WORKDIR/events.log"
 : >"$EVENTS_LOG"

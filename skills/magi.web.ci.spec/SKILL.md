@@ -1,10 +1,10 @@
 ---
-name: maestro.web.ci.spec
+name: magi.web.ci.spec
 description: Produce a sprint CI.md covering pipeline stages, secrets handling, deployment strategy, and rollback for GitHub Actions / Cloud Build / GitLab CI / etc. Coordinator-only — produces drafts, never modifies live workflows. Pauses for user confirmation.
 disable-model-invocation: true
 ---
 
-# /maestro.web.ci.spec — CI/CD elaboration
+# /magi.web.ci.spec — CI/CD elaboration
 
 You are the coordinator. Plan a CI/CD pipeline change and capture the
 analysis in `docs/<num>-<slug>/CI.md`. **You never push to the workflow,
@@ -16,10 +16,10 @@ trigger a deploy, or rotate a secret.** Read
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If config missing → tell user to run `/maestro.setup`.
+If config missing → tell user to run `/magi.setup`.
 
 ## 1. Locate sprint + CI tool
 
@@ -136,11 +136,11 @@ How will the user validate this change before merging?
 
 Based on the section above, generate a draft workflow file:
 
-- GHA: `<sprint>/.github/workflows/<name>.yml`
-- Cloud Build: `<sprint>/cloudbuild-<name>.yaml`
+- GHA: `docs/<num>-<slug>/.github/workflows/<name>.yml`
+- Cloud Build: `docs/<num>-<slug>/cloudbuild-<name>.yaml`
 - etc.
 
-The path is **inside the sprint dir** so it does not pollute the project's
+The path is **inside the doc dir** so it does not pollute the project's
 real workflow directory until the user reviews and moves it.
 
 Use the skeletons from the reference. Fill in concrete values from the
@@ -162,7 +162,7 @@ Show the user:
 
 Recommend next:
 - Manual review of the draft workflow.
-- `/maestro.review-plan` to have other models inspect it.
+- `/magi.review-plan` to have other models inspect it.
 - After review, user moves the file to its real location and opens a PR.
 
 **Never push the workflow to its live location, never trigger a build,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude CLI adapter for maestro-workflow xreview orchestrator.
+# Claude CLI adapter for magi xreview orchestrator.
 #
 # Modes:
 #   --healthcheck <config>

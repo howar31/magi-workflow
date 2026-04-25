@@ -1,12 +1,12 @@
 ---
-name: maestro.work
-description: Execute the next undone task(s) from a sprint's TASKS.md by dispatching the maestro-developer subagent (Sonnet by default). Updates WORKS.md as a development log. Pauses for user confirmation before any commit. Supports --model, --task, --milestone, --parallel for fine-grained control.
+name: magi.work
+description: Execute the next undone task(s) from a sprint's TASKS.md by dispatching the magi-developer subagent (Sonnet by default). Updates WORKS.md as a development log. Pauses for user confirmation before any commit. Supports --model, --task, --milestone, --parallel for fine-grained control.
 disable-model-invocation: true
 ---
 
-# /maestro.work — execute tasks via subagent
+# /magi.work — execute tasks via subagent
 
-You are the coordinator. Read TASKS.md, dispatch `maestro-developer` to do
+You are the coordinator. Read TASKS.md, dispatch `magi-developer` to do
 the work, collect results, update WORKS.md, and stop. **You do not write
 production code yourself.**
 
@@ -15,10 +15,10 @@ production code yourself.**
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If config missing → tell user to run `/maestro.setup`.
+If config missing → tell user to run `/magi.setup`.
 
 ## 1. Locate sprint + task selection
 
@@ -35,7 +35,7 @@ Read `TASKS.md`. Determine the next batch of work:
   sequentially.
 
 If nothing is left to do, tell the user the sprint is complete and suggest
-`/maestro.review-code`.
+`/magi.review-code`.
 
 ## 2. Read context
 
@@ -104,7 +104,7 @@ End with DONE: <summary> or BLOCKED: <reason>, per agent system prompt.
 
 ## 4. Dispatch
 
-Use the Task tool with `subagent_type: maestro-developer` (or whatever
+Use the Task tool with `subagent_type: magi-developer` (or whatever
 override the user passed via `--model`).
 
 **Sequential batch:**
@@ -155,9 +155,9 @@ Tell the user:
 - What got done (link/cite tasks).
 - What test status looks like.
 - Recommended next step:
-  - More tasks remaining in this milestone → another `/maestro.work` (or
+  - More tasks remaining in this milestone → another `/magi.work` (or
     auto-continue if user says so).
-  - Milestone done → `/maestro.review-code` (multi-model MAGI by default) before
+  - Milestone done → `/magi.review-code` (multi-model MAGI by default) before
     commit.
   - Blocking issue → ask the user.
 

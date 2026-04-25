@@ -1,10 +1,10 @@
 ---
-name: maestro.plan
-description: Draft a structured plan (PLAN.md) or spec (SPEC.md) for a new feature, in docs/<num>-<name>/, then pause for user confirmation. The coordinator uses Opus-class reasoning. Reads existing PRD.md / TECHSTACK.md if they exist at docs/. Argument is a free-text feature description; e.g., /maestro.plan "add user profile page".
+name: magi.plan
+description: Draft a structured plan (PLAN.md) or spec (SPEC.md) for a new feature, in docs/<num>-<name>/, then pause for user confirmation. The coordinator uses Opus-class reasoning. Reads existing PRD.md / TECHSTACK.md if they exist at docs/. Argument is a free-text feature description; e.g., /magi.plan "add user profile page".
 disable-model-invocation: true
 ---
 
-# /maestro.plan — feature planning
+# /magi.plan — feature planning
 
 You are the coordinator (Opus). Convert the user's feature request into a
 PLAN.md or SPEC.md in a fresh sprint folder, then stop and wait for user
@@ -15,17 +15,17 @@ confirmation. **You do not write production code in this skill.**
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If `$USER_CONFIG` is missing, tell the user to run `/maestro.setup` first.
+If `$USER_CONFIG` is missing, tell the user to run `/magi.setup` first.
 
 ## 1. Resolve the sprint folder
 
 The convention: every feature lives in `docs/<num>-<slug>/`.
 
 1. If the user supplied a path or slug as an argument prefix (e.g.,
-   `/maestro.plan profile-page "<details>"`), use it as the slug.
+   `/magi.plan profile-page "<details>"`), use it as the slug.
 2. Otherwise infer a kebab-case slug from the description (max 4 words).
 3. Pick `<num>` as max(existing sprint numbers in `docs/`) + 1, zero-padded
    to 2 digits (e.g. `03-profile-page`). If `docs/` does not exist yet,
@@ -74,7 +74,7 @@ Explain in enough detail that a reviewer (and future you) can sanity check.
 Include code paths, data shape changes, and any new dependencies.
 
 ## Open questions
-What remains uncertain. The /maestro.review-plan step should help resolve.
+What remains uncertain. The /magi.review-plan step should help resolve.
 
 ## Verification
 How we will know the implementation is correct.
@@ -118,7 +118,7 @@ mkdir -p "docs/<num>-<slug>"
 ```
 
 After writing, **stop and ask the user to confirm**. Do not auto-trigger
-`/maestro.review-plan`. The user is the gate.
+`/magi.review-plan`. The user is the gate.
 
 If the user wants edits, iterate until they confirm.
 
@@ -127,7 +127,7 @@ If the user wants edits, iterate until they confirm.
 When the user confirms the document:
 
 1. Tell them the next recommended step:
-   - `/maestro.review-plan` — multi-model review of this PLAN/SPEC.
+   - `/magi.review-plan` — multi-model review of this PLAN/SPEC.
 2. Do not run it automatically.
 
 ## Conventions
@@ -140,7 +140,7 @@ When the user confirms the document:
 
 ## Argument parsing
 
-The command form: `/maestro.plan [slug] "<description>"`.
+The command form: `/magi.plan [slug] "<description>"`.
 
 - `--model <name>` — override Coordinator model for this invocation
   (rarely needed; main session model is the default).

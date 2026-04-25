@@ -9,10 +9,10 @@ set -uo pipefail
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_ROOT="$(cd "$TEST_DIR/.." && pwd)"
 
-ORCHESTRATOR="$PLUGIN_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh"
+ORCHESTRATOR="$PLUGIN_ROOT/skills/magi.review-plan/scripts/orchestrator.sh"
 MAGI="$PLUGIN_ROOT/scripts/shared/magi-consensus.sh"
 
-PROMPT_FILE=$(mktemp -t maestro-prompt.XXXXXX.md)
+PROMPT_FILE=$(mktemp -t magi-prompt.XXXXXX.md)
 cat >"$PROMPT_FILE" <<'EOF'
 You are a brief reviewer. Reply with one short sentence:
 "Smoke test acknowledged from <your-cli-name>."

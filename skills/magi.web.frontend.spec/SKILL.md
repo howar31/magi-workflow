@@ -1,10 +1,10 @@
 ---
-name: maestro.web.frontend.spec
-description: Augment a sprint's SPEC.md with a Frontend section (component tree, state, a11y, routing, performance budget, Playwright e2e plan) tailored to the project's stack (React/Vue/Svelte/Solid/Astro/RN). Coordinator-only — does not write production code. Pauses for user confirmation. Read before /maestro.tasks so the test plan is captured in TASKS.md.
+name: magi.web.frontend.spec
+description: Augment a sprint's SPEC.md with a Frontend section (component tree, state, a11y, routing, performance budget, Playwright e2e plan) tailored to the project's stack (React/Vue/Svelte/Solid/Astro/RN). Coordinator-only — does not write production code. Pauses for user confirmation. Read before /magi.tasks so the test plan is captured in TASKS.md.
 disable-model-invocation: true
 ---
 
-# /maestro.web.frontend.spec — frontend elaboration
+# /magi.web.frontend.spec — frontend elaboration
 
 You are the coordinator. Add a frontend-specific section to a sprint's
 SPEC.md. **You do not write production code.** Read
@@ -15,10 +15,10 @@ SPEC.md. **You do not write production code.** Read
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If config missing → tell user to run `/maestro.setup`.
+If config missing → tell user to run `/magi.setup`.
 
 ## 1. Locate sprint + spec
 
@@ -26,7 +26,7 @@ Find the sprint folder (default: most recent; or `--sprint <num>-<slug>`).
 The folder must contain a PLAN.md or SPEC.md. If only PLAN.md exists,
 ask the user whether to upgrade to SPEC.md as part of this elaboration.
 
-If no sprint is open, abort and tell the user to run `/maestro.plan` first.
+If no sprint is open, abort and tell the user to run `/magi.plan` first.
 
 ## 2. Detect stack
 
@@ -92,12 +92,12 @@ Show the user:
 
 - Diff of SPEC.md (the new Frontend section)
 - Whether a stub e2e file was created
-- Top 3 open questions that need answering before `/maestro.tasks`
+- Top 3 open questions that need answering before `/magi.tasks`
 
 Recommend the next step:
-- `/maestro.tasks` if SPEC is now complete enough.
-- `/maestro.web.backend.spec` etc. if other domains apply to this sprint.
-- `/maestro.review-plan` if the user wants multi-model review before tasks.
+- `/magi.tasks` if SPEC is now complete enough.
+- `/magi.web.backend.spec` etc. if other domains apply to this sprint.
+- `/magi.review-plan` if the user wants multi-model review before tasks.
 
 **Do not run anything else automatically.**
 

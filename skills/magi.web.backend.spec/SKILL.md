@@ -1,10 +1,10 @@
 ---
-name: maestro.web.backend.spec
-description: Augment a sprint's SPEC.md with a Backend section (API contract, data model changes, authn/authz, validation, observability, contract test plan) tailored to the detected stack (Express/Fastify/Next/FastAPI/Django/Go/Rails/etc). Coordinator-only — does not write production code. Pauses for user confirmation. Run before /maestro.tasks.
+name: magi.web.backend.spec
+description: Augment a sprint's SPEC.md with a Backend section (API contract, data model changes, authn/authz, validation, observability, contract test plan) tailored to the detected stack (Express/Fastify/Next/FastAPI/Django/Go/Rails/etc). Coordinator-only — does not write production code. Pauses for user confirmation. Run before /magi.tasks.
 disable-model-invocation: true
 ---
 
-# /maestro.web.backend.spec — backend elaboration
+# /magi.web.backend.spec — backend elaboration
 
 You are the coordinator. Add a backend-specific section to a sprint's
 SPEC.md. **You do not write production code.** Read
@@ -15,17 +15,17 @@ SPEC.md. **You do not write production code.** Read
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If config missing → tell user to run `/maestro.setup`.
+If config missing → tell user to run `/magi.setup`.
 
 ## 1. Locate sprint + spec
 
 Find the sprint folder (default: most recent; or `--sprint <num>-<slug>`).
 Read the existing PLAN.md / SPEC.md.
 
-If no sprint is open, abort and tell the user to run `/maestro.plan` first.
+If no sprint is open, abort and tell the user to run `/magi.plan` first.
 
 ## 2. Detect stack
 
@@ -60,7 +60,7 @@ Following `references/domain/web/backend.md` "Deliverable" structure:
 
 ### a. API contract — write SCHEMA FIRST
 
-For REST: produce an OpenAPI excerpt (inline, or as `<sprint>/openapi.yaml`).
+For REST: produce an OpenAPI excerpt (inline, or as `docs/<num>-<slug>/openapi.yaml`).
 For GraphQL: SDL excerpt.
 
 Cover the fields in the reference's "Contract review checklist":
@@ -122,8 +122,8 @@ What's unresolved?
 Append under `## Backend` top-level heading. If a Backend section exists,
 ask before overwriting / merging.
 
-If the API contract is large, write it to `<sprint>/openapi.yaml` or
-`<sprint>/schema.graphql` and link from SPEC.md.
+If the API contract is large, write it to `docs/<num>-<slug>/openapi.yaml` or
+`docs/<num>-<slug>/schema.graphql` and link from SPEC.md.
 
 ## 6. Optional: scaffold contract test
 
@@ -142,9 +142,9 @@ Show the user:
 - Top 3 open questions
 
 Recommend next step:
-- `/maestro.tasks` if SPEC is complete.
-- `/maestro.web.frontend.spec` / `.infra.plan` / `.ci.spec` if relevant.
-- `/maestro.review-plan` for multi-model review.
+- `/magi.tasks` if SPEC is complete.
+- `/magi.web.frontend.spec` / `.infra.plan` / `.ci.spec` if relevant.
+- `/magi.review-plan` for multi-model review.
 
 ## Argument parsing
 

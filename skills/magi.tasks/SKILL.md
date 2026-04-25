@@ -1,10 +1,10 @@
 ---
-name: maestro.tasks
-description: Decompose a confirmed PLAN.md or SPEC.md into a TASKS.md milestone+checklist file in the same docs/<num>-<name>/ folder. Coordinator-only — does not write production code. Pauses for user confirmation before allowing /maestro.work to start.
+name: magi.tasks
+description: Decompose a confirmed PLAN.md or SPEC.md into a TASKS.md milestone+checklist file in the same docs/<num>-<name>/ folder. Coordinator-only — does not write production code. Pauses for user confirmation before allowing /magi.work to start.
 disable-model-invocation: true
 ---
 
-# /maestro.tasks — milestone & task decomposition
+# /magi.tasks — milestone & task decomposition
 
 You are the coordinator (Opus). Convert a confirmed PLAN.md or SPEC.md into a
 TASKS.md, then stop and wait for user confirmation. **You do not write
@@ -15,21 +15,21 @@ production code in this skill.**
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If `$USER_CONFIG` is missing, tell the user to run `/maestro.setup` first.
+If `$USER_CONFIG` is missing, tell the user to run `/magi.setup` first.
 
 ## 1. Locate the sprint
 
 Find the target `docs/<num>-<slug>/` folder:
 
-1. If user passed an argument (`/maestro.tasks 03-profile-page`), use it.
+1. If user passed an argument (`/magi.tasks 03-profile-page`), use it.
 2. Otherwise, list `docs/*/` folders sorted by `<num>` desc and ask the user
    to pick. Default to the most recent.
 
 Read the existing `PLAN.md` or `SPEC.md` in the chosen folder. If neither
-exists, tell the user to run `/maestro.plan` first.
+exists, tell the user to run `/magi.plan` first.
 
 ## 2. Read context
 
@@ -65,7 +65,7 @@ Produce milestones + tasks following this shape (in `output_language`):
   context already in PLAN/SPEC + the task line.
 - For **parallelisable** work within a milestone, mark a `🔀` lane:
   `- [ ] 🔀 [A] T1.1 — ...` and `- [ ] 🔀 [B] T1.2 — ...`. Lanes [A] and [B]
-  must touch disjoint files. /maestro.work can later dispatch parallel
+  must touch disjoint files. /magi.work can later dispatch parallel
   developers for `🔀` lanes.
 - Each task should imply at least one **test** that proves it. If the test is
   E2E or browser-based, note the recipe path (e.g. `# E2E: cypress/run.sh
@@ -87,7 +87,7 @@ If they want changes, iterate until they confirm.
 
 After confirmation:
 
-1. Recommend the next step: `/maestro.work` (or `/maestro.review-plan` if
+1. Recommend the next step: `/magi.work` (or `/magi.review-plan` if
    the PLAN was not yet reviewed).
 2. Do not run anything else automatically.
 
@@ -96,13 +96,13 @@ After confirmation:
 - File name is uppercase: `TASKS.md`.
 - Task IDs are stable: `T<milestone>.<index>`. They survive iteration so
   WORKS.md can reference them.
-- Once `/maestro.work` has started touching a TASKS.md, do not rewrite it
+- Once `/magi.work` has started touching a TASKS.md, do not rewrite it
   destructively in this skill — tell the user to revert + re-decompose, or
   edit specific tasks manually.
 
 ## Argument parsing
 
-- `/maestro.tasks` — most recent sprint
-- `/maestro.tasks <num>-<slug>` — explicit sprint folder
-- `/maestro.tasks --milestones N` — hint at desired milestone count (the
+- `/magi.tasks` — most recent sprint
+- `/magi.tasks <num>-<slug>` — explicit sprint folder
+- `/magi.tasks --milestones N` — hint at desired milestone count (the
   coordinator will try to honour but will not split where it makes no sense)

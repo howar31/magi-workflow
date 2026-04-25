@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/howar31/maestro-workflow/main/config/schema.json",
+  "$schema": "https://raw.githubusercontent.com/howar31/magi-workflow/main/config/schema.json",
   "version": "0.1.0",
   "xreview": {
     "reviewers": [

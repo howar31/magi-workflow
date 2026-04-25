@@ -10,38 +10,38 @@ All five phases (A–E) complete. The plugin is feature-complete relative to the
 
 - **Phase A** — orchestrator + three adapters (claude/gemini/codex) + MAGI consensus report builder.
 - **Phase B** — six core slash commands and override flags.
-- **Phase C** — two subagents (`maestro-developer` Sonnet, `maestro-reviewer` Opus).
+- **Phase C** — two subagents (`magi-developer` Sonnet, `magi-reviewer` Opus).
 - **Phase D** — four web-domain skills + reference docs.
 - **Phase E** — canonical `references/AGENTS.md`, optional git hooks (`commit-msg` Conventional Commits, `pre-commit` lint/typecheck auto-detect, `pre-push` WIP warning).
 
 ## Slash commands
 
-Every command is `disable-model-invocation: true` — it only runs when the user explicitly types `/maestro.<name>`.
+Every command is `disable-model-invocation: true` — it only runs when the user explicitly types `/magi.<name>`.
 
 ### Core flow
 
 | Command | Role | Pauses for user? |
 |---------|------|-------------------|
-| `/maestro.setup` | First-run onboarding: healthcheck CLIs, write `~/.config/maestro-workflow/config.json`, dry-run | yes (interactive) |
-| `/maestro.plan` | Coordinator drafts PLAN.md / SPEC.md in `docs/<num>-<slug>/` | yes (confirm doc) |
-| `/maestro.tasks` | Coordinator decomposes PLAN/SPEC into TASKS.md milestones + checklists | yes (confirm tasks) |
-| `/maestro.review-plan` | Multi-CLI MAGI review of PLAN/SPEC; outputs `MAGI_PLAN_REVIEW.md` | yes (verdict to user) |
-| `/maestro.work` | Dispatches `maestro-developer` (Sonnet) per task; updates WORKS.md | yes (before commit) |
-| `/maestro.review-code` | Default multi-CLI MAGI on git diff; `--single` falls back to `maestro-reviewer` (Opus) | yes (verdict to user) |
+| `/magi.setup` | First-run onboarding: healthcheck CLIs, write `~/.config/magi-workflow/config.json`, dry-run | yes (interactive) |
+| `/magi.plan` | Coordinator drafts PLAN.md / SPEC.md in `docs/<num>-<slug>/` | yes (confirm doc) |
+| `/magi.tasks` | Coordinator decomposes PLAN/SPEC into TASKS.md milestones + checklists | yes (confirm tasks) |
+| `/magi.review-plan` | Multi-CLI MAGI review of PLAN/SPEC; outputs `MAGI_PLAN_REVIEW.md` | yes (verdict to user) |
+| `/magi.work` | Dispatches `magi-developer` (Sonnet) per task; updates WORKS.md | yes (before commit) |
+| `/magi.review-code` | Default multi-CLI MAGI on git diff; `--single` falls back to `magi-reviewer` (Opus) | yes (verdict to user) |
 
-### Web-domain elaborations (run between `/maestro.plan` and `/maestro.tasks`)
+### Web-domain elaborations (run between `/magi.plan` and `/magi.tasks`)
 
 | Command | Role | Output |
 |---------|------|--------|
-| `/maestro.web.frontend.spec` | Append Frontend section (component tree, a11y, Playwright e2e) to SPEC.md | `SPEC.md` updated; optional Playwright stub |
-| `/maestro.web.backend.spec` | Append Backend section (OpenAPI/SDL contract, data model, authn/z, contract test) | `SPEC.md` updated; optional contract test stub |
-| `/maestro.web.infra.plan` | Generate `INFRA.md` with Terraform/gcloud dry-run, IAM diff, cost estimate, rollback | `<sprint>/INFRA.md`, `plan.tfplan`, `plan.json` |
-| `/maestro.web.ci.spec` | Generate `CI.md` + draft workflow file (GHA / Cloud Build / etc.) | `<sprint>/CI.md` + draft workflow inside sprint dir |
+| `/magi.web.frontend.spec` | Append Frontend section (component tree, a11y, Playwright e2e) to SPEC.md | `SPEC.md` updated; optional Playwright stub |
+| `/magi.web.backend.spec` | Append Backend section (OpenAPI/SDL contract, data model, authn/z, contract test) | `SPEC.md` updated; optional contract test stub |
+| `/magi.web.infra.plan` | Generate `INFRA.md` with Terraform/gcloud dry-run, IAM diff, cost estimate, rollback | `docs/<num>-<slug>/INFRA.md`, `plan.tfplan`, `plan.json` |
+| `/magi.web.ci.spec` | Generate `CI.md` + draft workflow file (GHA / Cloud Build / etc.) | `docs/<num>-<slug>/CI.md` + draft workflow inside the doc dir |
 
 ## Subagents
 
-- **`maestro-developer`** (`model: sonnet`) — TDD-first implementation worker. Read/Write/Edit/Bash/Grep/Glob. Reports `DONE: <summary>` or `BLOCKED: <reason>`. Does not make architecture decisions and does not commit.
-- **`maestro-reviewer`** (`model: opus`) — Defensive code reviewer. Read/Grep/Glob/Bash (read-only). Outputs structured Critical / Important / Note. Never edits files.
+- **`magi-developer`** (`model: sonnet`) — TDD-first implementation worker. Read/Write/Edit/Bash/Grep/Glob. Reports `DONE: <summary>` or `BLOCKED: <reason>`. Does not make architecture decisions and does not commit.
+- **`magi-reviewer`** (`model: opus`) — Defensive code reviewer. Read/Grep/Glob/Bash (read-only). Outputs structured Critical / Important / Note. Never edits files.
 
 ## Run / test commands
 
@@ -71,7 +71,7 @@ Every command is `disable-model-invocation: true` — it only runs when the user
 | Surface | Language |
 |---------|----------|
 | `CLAUDE.md`, `SPEC.md`, `references/**`, `skills/**/SKILL.md`, `agents/*.md` | English |
-| `README.md`, future `/maestro.setup` interactive prompts, plugin output to user | Traditional Chinese (zh-TW), configurable |
+| `README.md`, future `/magi.setup` interactive prompts, plugin output to user | Traditional Chinese (zh-TW), configurable |
 | Code comments | English |
 
 ### File naming
@@ -81,7 +81,7 @@ Every command is `disable-model-invocation: true` — it only runs when the user
 
 ## Adapter contract (when adding a new CLI)
 
-Every `skills/maestro.review-plan/scripts/adapters/<cli>.sh` must support:
+Every `skills/magi.review-plan/scripts/adapters/<cli>.sh` must support:
 
 1. `<adapter> --healthcheck <config>` — print `status=ok|skip|fail` plus optional `reason=` / `version=` / `path=` lines. Exit 0 (ok), 1 (skip), 2 (fail).
 2. `<adapter> run <config> <prompt-file> <log-file> <final-file> [model]` — invoke the CLI, write log + final, return:

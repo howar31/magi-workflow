@@ -34,14 +34,14 @@ is_auth_error() {
 }
 
 # Resolve config path with fallback chain:
-#   $MAESTRO_CONFIG_PATH > ~/.config/maestro-workflow/config.json > <plugin>/config/default.json
+#   $MAGI_CONFIG_PATH > ~/.config/magi-workflow/config.json > <plugin>/config/default.json
 resolve_config_path() {
   local plugin_default="$1"
-  if [[ -n "${MAESTRO_CONFIG_PATH:-}" && -f "$MAESTRO_CONFIG_PATH" ]]; then
-    echo "$MAESTRO_CONFIG_PATH"
+  if [[ -n "${MAGI_CONFIG_PATH:-}" && -f "$MAGI_CONFIG_PATH" ]]; then
+    echo "$MAGI_CONFIG_PATH"
     return 0
   fi
-  local user_config="$HOME/.config/maestro-workflow/config.json"
+  local user_config="$HOME/.config/magi-workflow-workflow/config.json"
   if [[ -f "$user_config" ]]; then
     echo "$user_config"
     return 0

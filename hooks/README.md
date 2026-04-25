@@ -1,6 +1,6 @@
 # Optional git hooks
 
-Drop-in git hooks that complement maestro-workflow's discipline. They are
+Drop-in git hooks that complement magi-workflow's discipline. They are
 **optional** — the plugin works without them — but they help enforce the
 guardrails locally.
 
@@ -18,16 +18,16 @@ All three are bash 3.2 compatible (macOS-friendly).
 
 ```bash
 # from the project root
-cp /opt/projects/maestro-workflow/hooks/commit-msg .git/hooks/commit-msg
-cp /opt/projects/maestro-workflow/hooks/pre-commit .git/hooks/pre-commit
-cp /opt/projects/maestro-workflow/hooks/pre-push   .git/hooks/pre-push
+cp /opt/projects/magi-workflow/hooks/commit-msg .git/hooks/commit-msg
+cp /opt/projects/magi-workflow/hooks/pre-commit .git/hooks/pre-commit
+cp /opt/projects/magi-workflow/hooks/pre-push   .git/hooks/pre-push
 chmod +x .git/hooks/{commit-msg,pre-commit,pre-push}
 ```
 
 Or run the bundled installer:
 
 ```bash
-bash /opt/projects/maestro-workflow/hooks/install.sh /path/to/your/repo
+bash /opt/projects/magi-workflow/hooks/install.sh /path/to/your/repo
 ```
 
 ## Install repo-wide via core.hooksPath
@@ -53,10 +53,10 @@ git config --unset core.hooksPath
 
 ## Skipping hooks (use sparingly)
 
-Each hook supports `MAESTRO_SKIP_HOOKS=1` to bypass without removing them:
+Each hook supports `MAGI_SKIP_HOOKS=1` to bypass without removing them:
 
 ```bash
-MAESTRO_SKIP_HOOKS=1 git commit -m "wip: experimental, will rebase"
+MAGI_SKIP_HOOKS=1 git commit -m "wip: experimental, will rebase"
 ```
 
 Do **not** habit-form `--no-verify`. The hooks exist for a reason; if a

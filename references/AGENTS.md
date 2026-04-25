@@ -1,4 +1,4 @@
-# AGENTS.md — canonical guidelines for maestro-workflow
+# AGENTS.md — canonical guidelines for magi-workflow
 
 This file is the single source of truth for how the coordinator and
 subagents operate inside a user's project. Every skill SKILL.md should
@@ -15,16 +15,16 @@ The plugin uses three model classes; the right one for the right job:
 | Job | Model class | Why |
 |-----|-------------|-----|
 | Coordinator (main session) — planning, dispatching, validating, applying MAGI rules | **Opus-class** | Deep reasoning, large context, judgement calls. |
-| `maestro-developer` subagent — TDD implementation | **Sonnet-class** | Fast, cheap, strong at structured code work. |
-| `maestro-reviewer` subagent — single-reviewer fallback | **Opus-class** | Defensive review needs reasoning. |
+| `magi-developer` subagent — TDD implementation | **Sonnet-class** | Fast, cheap, strong at structured code work. |
+| `magi-reviewer` subagent — single-reviewer fallback | **Opus-class** | Defensive review needs reasoning. |
 | Multi-CLI MAGI reviewers (claude / gemini / codex) | per CLI flagship | Independent perspectives; each CLI's strongest model. |
 
 ### When to override
 
-- Bump `maestro-developer` to **Opus** via `/maestro.work --model opus`
+- Bump `magi-developer` to **Opus** via `/magi.work --model opus`
   when the task involves multi-module refactors, intricate algorithm work,
   or the developer reported BLOCKED citing complexity on first dispatch.
-- Drop the multi-CLI MAGI to single-Opus via `/maestro.review-code --single`
+- Drop the multi-CLI MAGI to single-Opus via `/magi.review-code --single`
   when iterating quickly on tiny diffs and saving tokens matters.
 
 Never hard-code a specific model version (e.g. `claude-opus-4-7`). Use the
@@ -220,10 +220,10 @@ journal exists so future you can answer "why did we do it this way?").
 The plugin pauses for user confirmation at every gate. **Never skip a
 gate.** The user is the final authority on:
 
-- PLAN approval (after `/maestro.plan`)
-- TASKS approval (after `/maestro.tasks`)
-- MAGI verdict acceptance (after `/maestro.review-plan` or `/maestro.review-code`)
-- Implementation acceptance (after each `/maestro.work` batch)
+- PLAN approval (after `/magi.plan`)
+- TASKS approval (after `/magi.tasks`)
+- MAGI verdict acceptance (after `/magi.review-plan` or `/magi.review-code`)
+- Implementation acceptance (after each `/magi.work` batch)
 - Commit decision
 
 If a slash command is interrupted mid-flow, leave the artefacts in place
@@ -254,19 +254,19 @@ To set expectations and avoid scope creep:
 - Does not access third-party services beyond the configured CLIs
   (claude / gemini / codex).
 - Does not learn from the user's data — every invocation is stateless
-  beyond `~/.config/maestro-workflow/config.json`.
+  beyond `~/.config/magi-workflow/config.json`.
 
 ## 10. Failure modes and what to do
 
 | Symptom | What to do |
 |---------|------------|
-| `~/.config/maestro-workflow/config.json` missing | Tell user to run `/maestro.setup`. |
+| `~/.config/magi-workflow/config.json` missing | Tell user to run `/magi.setup`. |
 | A required reviewer (claude) failed | Abort the review; surface the cause (auth? quota? missing CLI?). |
 | Optional reviewers all failed | Continue in degraded mode; warn loudly. |
 | Subagent reported BLOCKED | Surface to user; do not silently retry. |
-| Tests fail after `maestro-developer` reported DONE | Treat as regression; do not silently fix; ask user. |
-| Workflow file already exists at the live path during `/maestro.web.ci.spec` | Write the draft to the sprint dir only; never overwrite live workflows. |
-| User asks for a commit before `/maestro.review-code` finished | Tell them review is incomplete; ask whether to skip review (defaults to no). |
+| Tests fail after `magi-developer` reported DONE | Treat as regression; do not silently fix; ask user. |
+| Workflow file already exists at the live path during `/magi.web.ci.spec` | Write the draft to the sprint dir only; never overwrite live workflows. |
+| User asks for a commit before `/magi.review-code` finished | Tell them review is incomplete; ask whether to skip review (defaults to no). |
 
 ## 11. Versioning and updates to these guidelines
 

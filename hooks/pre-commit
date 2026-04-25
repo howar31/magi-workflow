@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# maestro-workflow pre-commit hook
+# magi-workflow pre-commit hook
 # Auto-detects the project's lint / type-check / format-check commands
 # and runs them on staged content. Non-zero exit blocks the commit.
 #
@@ -12,11 +12,11 @@
 # Each runs only if the relevant config / lockfile is present at repo root.
 # Quiet on no-config; loud on failure.
 #
-# Skip with: MAESTRO_SKIP_HOOKS=1 git commit ...
+# Skip with: MAGI_SKIP_HOOKS=1 git commit ...
 
 set -uo pipefail
 
-if [[ "${MAESTRO_SKIP_HOOKS:-0}" == "1" ]]; then
+if [[ "${MAGI_SKIP_HOOKS:-0}" == "1" ]]; then
   exit 0
 fi
 
@@ -94,7 +94,7 @@ fi
 
 if (( failures > 0 )); then
   echo >&2
-  echo "✗ pre-commit: $failures check(s) failed. Fix and re-stage, or run with MAESTRO_SKIP_HOOKS=1 to bypass." >&2
+  echo "✗ pre-commit: $failures check(s) failed. Fix and re-stage, or run with MAGI_SKIP_HOOKS=1 to bypass." >&2
   exit 1
 fi
 

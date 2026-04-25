@@ -1,10 +1,10 @@
 ---
-name: maestro.web.infra.plan
+name: magi.web.infra.plan
 description: Produce a sprint INFRA.md covering Terraform / gcloud changes — dry-run plan, IAM diff, cost estimate, rollback. Coordinator-only — does not apply infra changes. Pauses for user confirmation. Bias toward GCP+Terraform but works with Pulumi / CloudFormation / Serverless / CDK.
 disable-model-invocation: true
 ---
 
-# /maestro.web.infra.plan — infra elaboration
+# /magi.web.infra.plan — infra elaboration
 
 You are the coordinator. Plan an infrastructure change and capture the
 analysis in `docs/<num>-<slug>/INFRA.md`. **You never run `terraform apply`,
@@ -16,10 +16,10 @@ analysis in `docs/<num>-<slug>/INFRA.md`. **You never run `terraform apply`,
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If config missing → tell user to run `/maestro.setup`.
+If config missing → tell user to run `/magi.setup`.
 
 ## 1. Locate sprint + IaC
 
@@ -161,7 +161,7 @@ Show the user:
 - Whether the change is reversible
 
 Recommend next:
-- If risks are 🔴: have user re-run `/maestro.review-plan` so other models
+- If risks are 🔴: have user re-run `/magi.review-plan` so other models
   also see the IAM diff.
 - If clean: tell user the apply commands they should run themselves
   (DO NOT run them).

@@ -1,10 +1,10 @@
 ---
-name: maestro.setup
-description: First-run onboarding wizard for maestro-workflow. Runs healthchecks on installed CLIs (claude/gemini/codex), records the user's preferred reviewer roster and weights into ~/.config/maestro-workflow/config.json, and validates end-to-end with a small dry-run. Use --recheck to re-validate without resetting config; --reset to wipe and start over.
+name: magi.setup
+description: First-run onboarding wizard for magi-workflow. Runs healthchecks on installed CLIs (claude/gemini/codex), records the user's preferred reviewer roster and weights into ~/.config/magi-workflow/config.json, and validates end-to-end with a small dry-run. Use --recheck to re-validate without resetting config; --reset to wipe and start over.
 disable-model-invocation: true
 ---
 
-# /maestro.setup — onboarding wizard
+# /magi.setup — onboarding wizard
 
 You are the coordinator. Walk the user through configuring this plugin so the
 multi-CLI orchestration works on their machine. Be interactive and helpful —
@@ -15,7 +15,7 @@ this is the user's first impression of the workflow.
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 DEFAULT_CONFIG="$PLUGIN_ROOT/config/default.json"
 ```
 
@@ -92,7 +92,7 @@ Ask the user for a default voting mode:
   user that pairing `unanimous` with `required: false` reviewers makes
   sense only if they are aware that a SKIP will abort.
 
-Per-invocation override is always possible via `/maestro.review-code --magi <mode>`,
+Per-invocation override is always possible via `/magi.review-code --magi <mode>`,
 so this is just the default.
 
 ## 5. Node / nvm
@@ -116,7 +116,7 @@ config or `zh-TW`. Plugin internal text remains in English regardless.
 ## 7. Write config
 
 Build the JSON object (preserve unset fields by reading `$DEFAULT_CONFIG`
-as the base and overlaying user choices). Create `~/.config/maestro-workflow/`
+as the base and overlaying user choices). Create `~/.config/magi-workflow/`
 if needed and write `$USER_CONFIG` with `chmod 644`.
 
 Validate with `jq '.' "$USER_CONFIG"` before declaring success.
@@ -126,11 +126,11 @@ Validate with `jq '.' "$USER_CONFIG"` before declaring success.
 Run a small end-to-end test to confirm the config works:
 
 ```bash
-PROMPT=$(mktemp -t maestro-setup-prompt.XXXXXX.md)
-echo "Setup validation: please reply with 'maestro setup OK from <your-cli-name>'." > "$PROMPT"
+PROMPT=$(mktemp -t magi-setup-prompt.XXXXXX.md)
+echo "Setup validation: please reply with 'magi setup OK from <your-cli-name>'." > "$PROMPT"
 
-MAESTRO_CONFIG_PATH="$USER_CONFIG" \
-  "$PLUGIN_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh" "$PROMPT"
+MAGI_CONFIG_PATH="$USER_CONFIG" \
+  "$PLUGIN_ROOT/skills/magi.review-plan/scripts/orchestrator.sh" "$PROMPT"
 
 rm -f "$PROMPT"
 ```
@@ -147,9 +147,9 @@ End with a short user-facing summary in `output_language`:
 - Active MAGI mode
 - Config location: `$USER_CONFIG`
 - Next steps:
-  - `/maestro.plan "<feature description>"` — start a new feature
-  - `/maestro.setup --recheck` — re-validate after CLI / Node updates
-  - `/maestro.setup --reset` — start over
+  - `/magi.plan "<feature description>"` — start a new feature
+  - `/magi.setup --recheck` — re-validate after CLI / Node updates
+  - `/magi.setup --reset` — start over
 
 ## Conventions
 

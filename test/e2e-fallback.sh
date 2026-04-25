@@ -15,10 +15,10 @@ TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_ROOT="$(cd "$TEST_DIR/.." && pwd)"
 MAGI="$PLUGIN_ROOT/scripts/shared/magi-consensus.sh"
 
-TMP_ROOT=$(mktemp -d -t maestro-fb-test.XXXXXX)
+TMP_ROOT=$(mktemp -d -t magi-fb-test.XXXXXX)
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
-mkdir -p "$TMP_ROOT/skills/maestro.review-plan/scripts/adapters"
+mkdir -p "$TMP_ROOT/skills/magi.review-plan/scripts/adapters"
 mkdir -p "$TMP_ROOT/scripts/shared"
 mkdir -p "$TMP_ROOT/config"
 
@@ -28,10 +28,10 @@ ln -s "$PLUGIN_ROOT/scripts/shared/error-patterns.sh"  "$TMP_ROOT/scripts/shared
 ln -s "$PLUGIN_ROOT/scripts/shared/nvm-exec.sh"        "$TMP_ROOT/scripts/shared/"
 ln -s "$PLUGIN_ROOT/scripts/shared/magi-consensus.sh"  "$TMP_ROOT/scripts/shared/"
 ln -s "$PLUGIN_ROOT/scripts/shared/preflight.sh"       "$TMP_ROOT/scripts/shared/"
-ln -s "$PLUGIN_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh" \
-      "$TMP_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh"
+ln -s "$PLUGIN_ROOT/skills/magi.review-plan/scripts/orchestrator.sh" \
+      "$TMP_ROOT/skills/magi.review-plan/scripts/orchestrator.sh"
 
-ADAPTERS="$TMP_ROOT/skills/maestro.review-plan/scripts/adapters"
+ADAPTERS="$TMP_ROOT/skills/magi.review-plan/scripts/adapters"
 
 # Mock claude: succeeds with canned output.
 cat >"$ADAPTERS/claude.sh" <<'MOCK'
@@ -104,7 +104,7 @@ cat >"$TMP_ROOT/config/default.json" <<'CFG'
 }
 CFG
 
-PROMPT=$(mktemp -t maestro-fb-prompt.XXXXXX.md)
+PROMPT=$(mktemp -t magi-fb-prompt.XXXXXX.md)
 echo "Mock review prompt." >"$PROMPT"
 trap 'rm -rf "$TMP_ROOT" "$PROMPT"' EXIT
 
@@ -112,8 +112,8 @@ echo "── e2e fallback test ────────────────�
 echo "Mock plugin root: $TMP_ROOT"
 
 ORCH_OUT=$(mktemp -t orch-fb.XXXXXX)
-MAESTRO_CONFIG_PATH="$TMP_ROOT/config/default.json" \
-  "$TMP_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh" "$PROMPT" \
+MAGI_CONFIG_PATH="$TMP_ROOT/config/default.json" \
+  "$TMP_ROOT/skills/magi.review-plan/scripts/orchestrator.sh" "$PROMPT" \
   | tee "$ORCH_OUT"
 orch_rc=${PIPESTATUS[0]}
 echo "(orchestrator rc=$orch_rc)"

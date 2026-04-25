@@ -1,10 +1,10 @@
 ---
-name: maestro.review-code
-description: Review the current git diff. Default behaviour is multi-CLI MAGI cross-review (orchestrator + magi-consensus). Use --single to fall back to a single Opus reviewer (the maestro-reviewer subagent) — saves tokens but loses cross-validation. Supports --magi <mode> override and --reviewers override. Never auto-fixes; always presents findings for the user to decide.
+name: magi.review-code
+description: Review the current git diff. Default behaviour is multi-CLI MAGI cross-review (orchestrator + magi-consensus). Use --single to fall back to a single Opus reviewer (the magi-reviewer subagent) — saves tokens but loses cross-validation. Supports --magi <mode> override and --reviewers override. Never auto-fixes; always presents findings for the user to decide.
 disable-model-invocation: true
 ---
 
-# /maestro.review-code — code review (MAGI by default)
+# /magi.review-code — code review (MAGI by default)
 
 You are the coordinator. Review the current uncommitted change set (or a
 specified diff) and produce a structured verdict. Default: multi-CLI MAGI.
@@ -15,10 +15,10 @@ Fallback: single-reviewer subagent.
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/maestro-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
 ```
 
-If config missing → tell user to run `/maestro.setup`.
+If config missing → tell user to run `/magi.setup`.
 
 Confirm we are inside a git repo:
 
@@ -51,7 +51,7 @@ get spent.
 
 ### 2a. Single-reviewer mode (`--single`)
 
-Dispatch the `maestro-reviewer` subagent. Build a brief:
+Dispatch the `magi-reviewer` subagent. Build a brief:
 
 ```markdown
 You are dispatched to review this change set.
@@ -77,7 +77,7 @@ You are dispatched to review this change set.
 Follow your standard structure: Verdict + 🔴 / 🟡 / 🟢 sections.
 ```
 
-Use Task tool with `subagent_type: maestro-reviewer` (or `--model` override).
+Use Task tool with `subagent_type: magi-reviewer` (or `--model` override).
 
 ### 2b. Multi-CLI MAGI mode (default)
 
@@ -122,9 +122,9 @@ Do not edit files.
 Invoke orchestrator:
 
 ```bash
-WORKDIR=$(mktemp -d -t maestro-review.XXXXXX)
-MAESTRO_REVIEW_WORKDIR="$WORKDIR" \
-  "$PLUGIN_ROOT/skills/maestro.review-plan/scripts/orchestrator.sh" \
+WORKDIR=$(mktemp -d -t magi-review.XXXXXX)
+MAGI_REVIEW_WORKDIR="$WORKDIR" \
+  "$PLUGIN_ROOT/skills/magi.review-plan/scripts/orchestrator.sh" \
   "$workdir/review-prompt.md" \
   $reviewer_args
 ```
@@ -137,7 +137,7 @@ Stream events to user. Then run consensus:
 ```
 
 Apply MAGI rules per `references/MAGI_VOTING.md` (semantic dedup +
-weighted voting). Same procedure as `/maestro.review-plan` step 6.
+weighted voting). Same procedure as `/magi.review-plan` step 6.
 
 If `policy_pass=false`:
 
@@ -190,7 +190,7 @@ If verdict = APPROVE-WITH-NITS: list nits and ask user whether to address
 before commit (or note they can defer).
 
 If verdict = REQUEST-CHANGES: enumerate critical issues and recommend
-`/maestro.work --task <id>` (or manual edit) to address. Do not commit.
+`/magi.work --task <id>` (or manual edit) to address. Do not commit.
 
 **Never commit, never push, never auto-fix.** The user is the gate.
 

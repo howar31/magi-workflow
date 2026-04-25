@@ -1,6 +1,6 @@
 # SPEC.md
 
-Authoritative architecture and feature spec of `maestro-workflow`. Update when behavior changes.
+Authoritative architecture and feature spec of `magi-workflow`. Update when behavior changes.
 
 ## Vision
 
@@ -12,7 +12,7 @@ A Claude Code plugin that drives a five-stage engineering workflow with each sta
 4. **Implementation** — Sonnet-class subagent runs TDD against `TASKS.md`, updating `WORKS.md`.
 5. **Code review** — same MAGI-weighted multi-CLI fan-out applied to the diff.
 
-A `/maestro.setup` wizard runs once at install time to inspect installed CLIs, write `~/.config/maestro-workflow/config.json`, and surface unavailable reviewers.
+A `/magi.setup` wizard runs once at install time to inspect installed CLIs, write `~/.config/magi-workflow/config.json`, and surface unavailable reviewers.
 
 ## Implementation phases
 
@@ -20,7 +20,7 @@ A `/maestro.setup` wizard runs once at install time to inspect installed CLIs, w
 |-------|-------------|--------|
 | A | Orchestrator + three adapters + MAGI consensus + tests | ✅ done |
 | B | Setup wizard + 6 core skills + override flags | ✅ done |
-| C | Subagents (`maestro-developer` / `maestro-reviewer`) | ✅ done (folded into Phase B) |
+| C | Subagents (`magi-developer` / `magi-reviewer`) | ✅ done (folded into Phase B) |
 | D | Web-domain skills (frontend / backend / infra / ci) + 4 reference docs | ✅ done |
 | E | Canonical `references/AGENTS.md` + optional git hooks | ✅ done |
 
@@ -32,19 +32,19 @@ orchestrator + magi-consensus shell scripts and to the two subagents below.
 
 | Command | Body summary |
 |---------|--------------|
-| `/maestro.setup [--reset \| --recheck]` | Healthcheck CLIs via `preflight.sh`, ask user for reviewer roster + weights + MAGI mode + nvm version + output language, write `~/.config/maestro-workflow/config.json`, validate with a tiny dry-run via the orchestrator. |
-| `/maestro.plan [slug] "<desc>"` | Resolve `docs/<num>-<slug>/`, read project context (PRD/TECHSTACK/CLAUDE/AGENTS), decide PLAN.md vs SPEC.md, draft, pause for user confirmation. |
-| `/maestro.tasks [<num>-<slug>] [--milestones N]` | Read PLAN/SPEC, write TASKS.md with milestones + atomic tasks, mark `🔀` lanes for parallelisable work, pause for confirmation. |
-| `/maestro.review-plan [--reviewers ...] [--magi <mode>]` | Build review prompt from PLAN/SPEC, invoke orchestrator, run magi-consensus, then **the coordinator** applies semantic dedup + weighted vote per `references/MAGI_VOTING.md`, writes `MAGI_PLAN_REVIEW.md`. |
-| `/maestro.work [--milestone N \| --task T<m>.<n>] [--parallel] [--model ...]` | Read TASKS.md, dispatch `maestro-developer` per task (or per `🔀` lane in parallel), aggregate DONE/BLOCKED, append to WORKS.md, pause before commit. |
-| `/maestro.review-code [--single] [--magi <mode>] [--diff <range>]` | Default: orchestrator + MAGI on `git diff`. `--single`: dispatch `maestro-reviewer` only. Writes `MAGI_CODE_REVIEW.md` or `SINGLE_CODE_REVIEW.md`. Never auto-commits. |
+| `/magi.setup [--reset \| --recheck]` | Healthcheck CLIs via `preflight.sh`, ask user for reviewer roster + weights + MAGI mode + nvm version + output language, write `~/.config/magi-workflow/config.json`, validate with a tiny dry-run via the orchestrator. |
+| `/magi.plan [slug] "<desc>"` | Resolve `docs/<num>-<slug>/`, read project context (PRD/TECHSTACK/CLAUDE/AGENTS), decide PLAN.md vs SPEC.md, draft, pause for user confirmation. |
+| `/magi.tasks [<num>-<slug>] [--milestones N]` | Read PLAN/SPEC, write TASKS.md with milestones + atomic tasks, mark `🔀` lanes for parallelisable work, pause for confirmation. |
+| `/magi.review-plan [--reviewers ...] [--magi <mode>]` | Build review prompt from PLAN/SPEC, invoke orchestrator, run magi-consensus, then **the coordinator** applies semantic dedup + weighted vote per `references/MAGI_VOTING.md`, writes `MAGI_PLAN_REVIEW.md`. |
+| `/magi.work [--milestone N \| --task T<m>.<n>] [--parallel] [--model ...]` | Read TASKS.md, dispatch `magi-developer` per task (or per `🔀` lane in parallel), aggregate DONE/BLOCKED, append to WORKS.md, pause before commit. |
+| `/magi.review-code [--single] [--magi <mode>] [--diff <range>]` | Default: orchestrator + MAGI on `git diff`. `--single`: dispatch `magi-reviewer` only. Writes `MAGI_CODE_REVIEW.md` or `SINGLE_CODE_REVIEW.md`. Never auto-commits. |
 
 ## Subagents (Phase C — folded into B)
 
 | Agent | Model | Tools | Role |
 |-------|-------|-------|------|
-| `maestro-developer` | `sonnet` | Read, Write, Edit, Bash, Grep, Glob | TDD-first implementation worker. Receives a self-contained task brief from `/maestro.work`. Reports `DONE` or `BLOCKED`. Forbidden from architecture changes, scope expansion, commits, or package upgrades. |
-| `maestro-reviewer` | `opus` | Read, Grep, Glob, Bash (read-only) | Defensive code reviewer for `/maestro.review-code --single` and degraded-MAGI fallback. Outputs Verdict + 🔴 Critical / 🟡 Important / 🟢 Note. Never edits files. |
+| `magi-developer` | `sonnet` | Read, Write, Edit, Bash, Grep, Glob | TDD-first implementation worker. Receives a self-contained task brief from `/magi.work`. Reports `DONE` or `BLOCKED`. Forbidden from architecture changes, scope expansion, commits, or package upgrades. |
+| `magi-reviewer` | `opus` | Read, Grep, Glob, Bash (read-only) | Defensive code reviewer for `/magi.review-code --single` and degraded-MAGI fallback. Outputs Verdict + 🔴 Critical / 🟡 Important / 🟢 Note. Never edits files. |
 
 ## Override flags (Phase B)
 
@@ -55,7 +55,7 @@ Every slash command supports its applicable subset:
 | `--model <name>` | plan, tasks, work, review | Override the active model for this invocation. |
 | `--magi <mode>` | review-plan, review | Override MAGI mode (`majority` / `supermajority` / `unanimous` / `threshold:<N>`). |
 | `--reviewers <list>` | review-plan, review | Override the reviewer roster: `claude:opus,gemini:default,...`. |
-| `--single` | review | Skip MAGI; use `maestro-reviewer` subagent only. |
+| `--single` | review | Skip MAGI; use `magi-reviewer` subagent only. |
 | `--diff <range>` | review | Diff range to review. Defaults to working tree vs HEAD. |
 | `--staged` | review | Review only staged changes. |
 | `--workdir <path>` | review-plan, review | Reuse a previous orchestrator workdir; skip fan-out, re-run consensus. |
@@ -68,7 +68,7 @@ Every slash command supports its applicable subset:
 ### Components
 
 ```
-maestro-workflow/
+magi-workflow/
 ├── .claude-plugin/plugin.json                 # plugin metadata
 ├── config/default.json                        # reviewer list, MAGI rules, fallback policy
 ├── scripts/shared/
@@ -77,7 +77,7 @@ maestro-workflow/
 │   ├── nvm-exec.sh                            # nvm-aware CLI path resolution (sourced lib)
 │   ├── preflight.sh                           # aggregated CLI healthcheck → JSON
 │   └── magi-consensus.sh                      # consolidates per-reviewer outputs into a MAGI report
-├── skills/maestro.review-plan/scripts/
+├── skills/magi.review-plan/scripts/
 │   ├── orchestrator.sh                        # parallel fan-out + event stream + fallback policy
 │   └── adapters/{claude,gemini,codex}.sh      # CLI-specific run + healthcheck
 └── test/
@@ -102,7 +102,7 @@ Exit codes: `0` policy passed, `2` policy failed, `3` config error, `130` interr
 
 ### Adapter contract
 
-Every adapter at `skills/maestro.review-plan/scripts/adapters/<cli>.sh` supports two modes:
+Every adapter at `skills/magi.review-plan/scripts/adapters/<cli>.sh` supports two modes:
 
 1. `--healthcheck <config>` → prints `key=value` lines (`status` / `reason` / `version` / `path`) and exits 0/1/2.
 2. `run <config> <prompt-file> <log-file> <final-file> [model]` → exit codes:
@@ -175,7 +175,7 @@ This avoids the macOS pitfall where `gemini`'s shebang `#!/usr/bin/env node` res
 }
 ```
 
-Resolution order: `$MAESTRO_CONFIG_PATH` → `~/.config/maestro-workflow/config.json` → `<plugin>/config/default.json`.
+Resolution order: `$MAGI_CONFIG_PATH` → `~/.config/magi-workflow/config.json` → `<plugin>/config/default.json`.
 
 ## Tests
 
@@ -195,13 +195,13 @@ deploy, or commit operations.
 
 | Skill | Output | Reference |
 |-------|--------|-----------|
-| `/maestro.web.frontend.spec` | Frontend section appended to SPEC.md (component tree, state, a11y checklist, routing/data, perf budget, Playwright test plan); optional `tests/e2e/<feature>.spec.ts` stub | `references/domain/web/frontend.md` |
-| `/maestro.web.backend.spec` | Backend section appended to SPEC.md (OpenAPI / SDL contract, data model + migration plan, authn/z matrix, validation rules, observability, contract test plan); optional contract test stub | `references/domain/web/backend.md` |
-| `/maestro.web.infra.plan` | `<sprint>/INFRA.md` with Terraform `plan.tfplan` (dry-run only), IAM diff matrix, cost estimate via Infracost, rollback plan with STOP-checklist for irreversible changes | `references/domain/web/infra.md` |
-| `/maestro.web.ci.spec` | `<sprint>/CI.md` with stage breakdown, secrets/permissions audit, deployment strategy, smoke tests; draft workflow file inside the sprint dir (never written to live `.github/workflows/`) | `references/domain/web/ci-cd.md` |
+| `/magi.web.frontend.spec` | Frontend section appended to SPEC.md (component tree, state, a11y checklist, routing/data, perf budget, Playwright test plan); optional `tests/e2e/<feature>.spec.ts` stub | `references/domain/web/frontend.md` |
+| `/magi.web.backend.spec` | Backend section appended to SPEC.md (OpenAPI / SDL contract, data model + migration plan, authn/z matrix, validation rules, observability, contract test plan); optional contract test stub | `references/domain/web/backend.md` |
+| `/magi.web.infra.plan` | `docs/<num>-<slug>/INFRA.md` with Terraform `plan.tfplan` (dry-run only), IAM diff matrix, cost estimate via Infracost, rollback plan with STOP-checklist for irreversible changes | `references/domain/web/infra.md` |
+| `/magi.web.ci.spec` | `docs/<num>-<slug>/CI.md` with stage breakdown, secrets/permissions audit, deployment strategy, smoke tests; draft workflow file inside the same dir (never written to live `.github/workflows/`) | `references/domain/web/ci-cd.md` |
 
-Each skill is invoked between `/maestro.plan` (which produces the
-high-level SPEC) and `/maestro.tasks` (which decomposes into work
+Each skill is invoked between `/magi.plan` (which produces the
+high-level SPEC) and `/magi.tasks` (which decomposes into work
 units). They are independent — only invoke the ones a feature actually
 touches.
 
@@ -224,7 +224,7 @@ own project-level `CLAUDE.md` always overrides this file.
 | `pre-commit` | Auto-detects the project's lint / type-check / format-check commands (Node: pnpm/yarn/npm; Python: ruff/flake8/mypy/pyright; Go: vet/staticcheck; Rust: fmt/clippy) and runs them. Quiet on no-config; loud on failure. |
 | `pre-push` | Warns when commits being pushed contain `WIP` / `FIXME` / `fixup!` markers. Does **not** block. |
 
-All hooks are bash 3.2 compatible, support `MAESTRO_SKIP_HOOKS=1` for
+All hooks are bash 3.2 compatible, support `MAGI_SKIP_HOOKS=1` for
 single-shot bypass, and ship with `hooks/install.sh` for one-line
 installation into `.git/hooks/` (or copy to `.githooks/` and use
 `core.hooksPath` for repo-tracked hooks).
@@ -232,7 +232,7 @@ installation into `.git/hooks/` (or copy to `.githooks/` and use
 ## Still out of scope
 
 - Plugin marketplace registration — repo is currently consumed via
-  `claude plugin add github:howar31/maestro-workflow`.
+  `claude plugin add github:howar31/magi-workflow`.
 - Non-web domain skills (data engineering, ML, mobile, game). Architecture
-  is ready: add `skills/maestro.<domain>.<name>/` and
+  is ready: add `skills/magi.<domain>.<name>/` and
   `references/domain/<domain>/`.

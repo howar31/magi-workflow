@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# maestro-workflow pre-push hook
+# magi-workflow pre-push hook
 # Warns when commits being pushed contain WIP / FIXME markers in their
 # subject lines. Does NOT block — surfaces for awareness.
 #
-# Skip with: MAESTRO_SKIP_HOOKS=1 git push ...
+# Skip with: MAGI_SKIP_HOOKS=1 git push ...
 
 set -uo pipefail
 
-if [[ "${MAESTRO_SKIP_HOOKS:-0}" == "1" ]]; then
+if [[ "${MAGI_SKIP_HOOKS:-0}" == "1" ]]; then
   exit 0
 fi
 
@@ -31,7 +31,7 @@ done
 
 if (( flagged == 1 )); then
   echo >&2
-  echo "These commits look unfinished. Push anyway? Re-run with MAESTRO_SKIP_HOOKS=1 to suppress this warning." >&2
+  echo "These commits look unfinished. Push anyway? Re-run with MAGI_SKIP_HOOKS=1 to suppress this warning." >&2
   # Don't block — warn only.
 fi
 
