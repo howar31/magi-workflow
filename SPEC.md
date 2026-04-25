@@ -527,3 +527,15 @@ Or via slash commands inside a session: `/plugin marketplace add ...` +
 - Non-web domain skills (data engineering, ML, mobile, game). Architecture
   is ready: add `skills/magi.<domain>.<name>/` and
   `references/domain/<domain>/`.
+- **Multi-developer parallel sprints** — `detect-state.sh` defaults to
+  the latest sprint folder; `--sprint <slug>` is the manual escape hatch.
+  Cross-sprint conflict resolution (e.g., two sprints both modifying root
+  SPEC.md, `/magi.commit` mode-detection picking the wrong sprint, review
+  consensus across simultaneous branches) deferred until team-collaborative
+  use accumulates real evidence.
+- **Reflexion strengthening on B-class drift** — DRIFT.md retains B-class
+  items (developer choices below the contract) as static audit trail. A
+  future iteration may detect when a particular kind of B-class entry
+  recurs frequently and proactively suggest `/magi.plan --into <sprint>`
+  to formalize the choice into PLAN/SPEC. Threshold not yet set; deferred
+  until real sprint usage shows density patterns.

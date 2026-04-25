@@ -1,5 +1,12 @@
 # magi-workflow
 
+[![License: MIT](https://img.shields.io/github/license/howar31/magi-workflow?color=blue)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/howar31/magi-workflow?style=social)](https://github.com/howar31/magi-workflow/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/howar31/magi-workflow)](https://github.com/howar31/magi-workflow/commits/main)
+[![Open issues](https://img.shields.io/github/issues/howar31/magi-workflow)](https://github.com/howar31/magi-workflow/issues)
+[![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-CC785C)](https://claude.com/claude-code)
+[![Sponsor on Ko-fi](https://img.shields.io/badge/sponsor-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/howar31)
+
 > 多模型協作的軟體工程 workflow plugin（for Claude Code）
 
 讓不同階段使用不同 AI 模型發揮各自所長：Opus 規劃、Gemini + Codex + Opus 並行審議、Sonnet 實作、再用 MAGI 加權投票收斂結果。
@@ -7,7 +14,7 @@
 ## 特色
 
 - **🧭 自動引導，不用記指令** — 每個 skill 都做狀態 preflight；如果你跑了不對的指令，它告訴你正確的下一步。每個 skill 結束時主動建議下個動作。**你不用記 plan → tasks → work → review → commit 這套儀式，workflow 自己引導**
-- **🎯 智能 dispatcher** — `/magi.plan "<任何描述>"` 自動分類 type（feat/fix/hotfix/refactor/chore/docs/...）× scale（trivial/minor/major），路由到對應 artifact（PLAN/SPEC/TICKET/HOTFIX/no-artifact）。改 typo 不會跑出完整 PLAN.md，緊急修復走 fast-path
+- **🎯 智慧型 dispatcher** — `/magi.plan "<任何描述>"` 自動分類 type（feat/fix/hotfix/refactor/chore/docs/...）× scale（trivial/minor/major），路由到對應 artifact（PLAN/SPEC/TICKET/HOTFIX/no-artifact）。改 typo 不會跑出完整 PLAN.md，緊急修復走 fast-path
 - **多 CLI 並行審議** — `claude` / `gemini` / `codex` 在同一道閘門平行 fan-out，事件流協定 + quota / auth 自動降級
 - **MAGI 加權投票** — 4 種模式（majority / supermajority / unanimous / threshold）；reviewer 失敗時退化模式透明標示
 - **契約即真理 + 自動 drift 偵測** — `/magi.plan` 寫的 PLAN/SPEC/TICKET/HOTFIX 是凍結契約；`/magi.review-code` 自動比對 code 與契約，輸出 `DRIFT.md`（A 類違反 / B 類自由 / C 類觀察）；`/magi.commit` sprint mode 引導使用者把 A 類回填、C 類升級到 `docs/BACKLOG.md`
@@ -116,96 +123,78 @@ cd /opt/projects/magi-workflow
 
 ## 工作流總覽
 
+magi-workflow 的核心是 `/magi.plan` 智慧型 dispatcher——它根據你的描述分類 type × scale，路由到四條不同重量的流程：
+
 ```mermaid
 flowchart TD
-    Start([需求]) --> FirstRun{首次使用?}
-    FirstRun -- 是 --> Setup["/magi.setup<br/>CLI 健檢 + 寫 config"]
-    FirstRun -- 否 --> Plan
-    Setup --> Plan
+    Start([需求]) --> SetupGate{首次安裝?}
+    SetupGate -- 是 --> Setup["/magi.setup<br/>healthcheck + config<br/>(per-machine, 一次)"]
+    SetupGate -- 否 --> InitGate
+    Setup --> InitGate
 
-    subgraph PlanPhase["📋 規劃階段（Coordinator: Opus）"]
-        Plan["/magi.plan<br/>→ PLAN.md 或 SPEC.md"]
+    InitGate{專案 init 過?} -- 否 --> Init["/magi.init<br/>scaffold root + docs/<br/>(per-project, 一次)"]
+    InitGate -- 是 --> Plan
+    Init --> Plan
+
+    subgraph Dispatch["🎯 /magi.plan 智慧型 dispatcher"]
+        Plan["/magi.plan &quot;&lt;任何描述&gt;&quot;<br/>type × scale 語意分類<br/>(zh-TW / en / 混雜均可)"]
+        Plan --> Route{路由 + user 確認}
     end
 
-    Plan --> XPlanCmd
+    Route -- "major feat / refactor" --> ArtBig["PLAN.md 或 SPEC.md"]
+    Route -- "minor / 中等任務" --> ArtMid["TICKET.md"]
+    Route -- hotfix --> ArtHot["HOTFIX.md"]
+    Route -- "trivial chore / docs / typo" --> ArtTiny["(無 artifact)"]
 
-    subgraph MAGI1["🧠 MAGI 審議 — Plan"]
-        XPlanCmd["/magi.review-plan<br/>orchestrator.sh fan-out"]
-        R1c["claude:opus<br/>weight 2"]
-        R1g["gemini:default<br/>weight 1"]
-        R1x["codex:default<br/>weight 1"]
-        Consensus1["magi-consensus.sh<br/>加權投票 + 退化偵測"]
-        XPlanCmd --> R1c
-        XPlanCmd --> R1g
-        XPlanCmd --> R1x
-        R1c --> Consensus1
-        R1g --> Consensus1
-        R1x --> Consensus1
-    end
+    ArtBig -. optional .-> RP["/magi.review-plan<br/>多 CLI MAGI fan-out<br/>→ MAGI_PLAN_REVIEW.md"]
+    ArtBig --> Tasks
+    ArtMid --> Tasks
+    ArtHot --> Go
+    ArtTiny --> Stand
+    RP --> Tasks
 
-    Consensus1 --> UPlan{使用者確認 PLAN?}
-    UPlan -- 修 PLAN --> Plan
-    UPlan -- ✓ --> Tasks
+    Tasks["/magi.tasks<br/>→ TASKS.md (含 🔀 lane)"]
+    Tasks --> Go
 
-    subgraph TasksPhase["📋 拆解（Coordinator: Opus）"]
-        Tasks["/magi.tasks<br/>→ TASKS.md"]
-    end
+    Go["/magi.go<br/>magi-developer (Sonnet) × TDD<br/>auto-parallel disjoint tasks<br/>→ WORKS.md"]
+    Go --> RC
 
-    Tasks --> UTasks{使用者確認 TASKS?}
-    UTasks -- 修 TASKS --> Tasks
-    UTasks -- ✓ --> Work
+    RC["/magi.review-code (mandatory)<br/>多 CLI MAGI 或 --single<br/>→ MAGI_CODE_REVIEW.md + DRIFT.md"]
+    RC --> Verdict{verdict / drift?}
+    Verdict -- "REQUEST-CHANGES" --> Go
+    Verdict -- 通過 --> Sprint
 
-    subgraph ImplPhase["⚙️ 實作階段"]
-        Work["/magi.go<br/>dispatch magi-developer (Sonnet)<br/>TDD → WORKS.md"]
-    end
+    Sprint["/magi.commit (sprint mode)<br/>A 類回填 PLAN/SPEC<br/>C 類 → docs/BACKLOG.md<br/>root sync 偵測"]
+    Stand["/magi.commit (standalone mode)<br/>chore / docs / 小 fix<br/>root sync 偵測"]
 
-    Work --> XReviewCmd
+    Sprint --> Done([git commit])
+    Stand --> Done
 
-    subgraph MAGI2["🧠 MAGI 審議 — Code"]
-        XReviewCmd["/magi.review-code<br/>orchestrator.sh fan-out"]
-        R2c["claude:opus<br/>weight 2"]
-        R2g["gemini:default<br/>weight 1"]
-        R2x["codex:default<br/>weight 1"]
-        Consensus2["magi-consensus.sh<br/>加權投票 + 退化偵測"]
-        XReviewCmd --> R2c
-        XReviewCmd --> R2g
-        XReviewCmd --> R2x
-        R2c --> Consensus2
-        R2g --> Consensus2
-        R2x --> Consensus2
-    end
-
-    Consensus2 --> Drift["產出 DRIFT.md<br/>(Status: NONE / DETECTED)"]
-    Drift --> Verdict{採納 critical?}
-    Verdict -- 需修正 --> Work
-    Verdict -- 通過 --> CommitCmd["/magi.commit"]
-
-    subgraph CommitPhase["📦 Commit 階段"]
-        CommitCmd --> CommitMode{Sprint context?}
-        CommitMode -- 是 --> SprintMode["Sprint mode<br/>A 類回填 + C 類→BACKLOG<br/>+ root sync detect"]
-        CommitMode -- 否 --> StandaloneMode["Standalone mode<br/>(chore / docs / 小 fix)<br/>+ root sync detect"]
-        SprintMode --> ConfirmCommit([使用者確認 message])
-        StandaloneMode --> ConfirmCommit
-    end
-
-    ConfirmCommit --> Done([git commit])
+    classDef optional stroke-dasharray: 5 5
+    class RP optional
 ```
 
-> 圖中三家 reviewer 是預設配置（claude / gemini / codex）；實際啟用哪幾家、權重多少、required 與否，由 `~/.config/magi-workflow/config.json` 控制。
+讀法：
+- **每個指令都有 state preflight**：跑錯就拒絕、告訴你下一步。圖上沒畫 preflight 邏輯（每個節點都有，畫了會爆）
+- **虛線 = optional**：`/magi.review-plan` 可以省略——人類自己審 PLAN 也行，省 token
+- **實線 = mandatory**：`/magi.review-code` 不能省——產出 `DRIFT.md` 是 `/magi.commit` sprint mode 的必需輸入
+- **dispatcher 四條路**：trivial 完全跳過 sprint folder；hotfix 連 `/magi.tasks` 也跳；TICKET 跳 review-plan；只有 major 走完整流程
+- **MAGI fan-out**：兩個 review skill 在內部都是「多 CLI 平行 + 加權投票」（claude / gemini / codex），實際啟用哪幾家由 `~/.config/magi-workflow/config.json` 控制
 
 ### Web add-ons 插入點
 
+四個 web 領域 spec skill 只在 PLAN.md / SPEC.md / TICKET.md 路徑插入（hotfix / trivial 路徑跳過）。在 `/magi.plan` 之後、`/magi.review-plan` 或 `/magi.tasks` 之前手動觸發：
+
 ```mermaid
 flowchart LR
-    Plan["/magi.plan"] --> FE["/magi.web.frontend.spec<br/>→ SPEC.md (frontend)"]
-    FE --> BE["/magi.web.backend.spec<br/>→ SPEC.md (backend)"]
+    PlanArt["PLAN.md / SPEC.md / TICKET.md"] --> FE["/magi.web.frontend.spec<br/>(component / a11y / e2e)"]
+    FE --> BE["/magi.web.backend.spec<br/>(API / migration / authz)"]
     BE --> INF["/magi.web.infra.plan<br/>→ INFRA.md"]
     INF --> CI["/magi.web.ci.spec<br/>→ CI.md"]
-    CI --> Review["/magi.review-plan"]
-    Review --> Tasks["/magi.tasks"]
+    CI --> Next["/magi.review-plan 或 /magi.tasks"]
 ```
 
-只用到的 add-on 才需要跑；四個彼此獨立。
+只用到的 add-on 才需要跑；四個彼此獨立。每個都會做 state preflight，沒 PLAN/SPEC/TICKET 就 refuse。
 
 ### 外部 CLI reviewer 怎麼跑
 
@@ -435,6 +424,25 @@ config 在 `~/.config/magi-workflow/config.json`，移除 plugin 不會自動刪
 # 真實 CLI 測試（每家 reviewer 跑一次 short prompt）
 ./test/e2e-smoke.sh
 ```
+
+## 尚未涵蓋的情境（已知限制）
+
+magi-workflow 目前刻意不處理以下兩個情境，等實際使用累積到痛點才回頭補。列在這裡是為了避免使用者誤以為「我哪裡用錯了」。
+
+### 多人團隊並行 sprint 的衝突
+
+magi-workflow 目前的 state 偵測（`detect-state.sh`）以「最新 sprint」為 default。當多人在同一 repo 平行跑不同 feature branch、各自有 active sprint 時，可能出現：
+- `/magi.commit` 自動偵測模式時挑錯 sprint（不過已有 `--sprint <slug>` 手動指定當 escape hatch）
+- 兩個 sprint 都改了 root SPEC.md，merge 時要怎麼整合
+- 跨 sprint 的 review 共識、commit 順序協調
+
+**目前解法**：用 `--sprint <slug>` 明確指定，或約定每個 branch 只跑一個 sprint。等團隊化使用累積到實際痛點再做完整方案。
+
+### B 類偏離的累積回饋（Reflexion 強化）
+
+`/magi.review-code` 的 DRIFT.md 把 B 類條目（implementation 在契約之下的自由選擇）留在檔內當 audit trail，不主動提醒 user 處理。但長期下來，**如果某一類 B 條目反覆出現**，意味著契約對該層其實還不夠具體，PLAN/SPEC 應該往下挖一階。
+
+**目前解法**：B 類靜態保留；user 自己讀 DRIFT.md 發現 pattern 後手動 `/magi.plan --into <sprint>` 修契約。等真實 sprint 累積出 B 類密度數據再評估自動化提醒的閾值。
 
 ## 設計守則
 
