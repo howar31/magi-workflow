@@ -1,0 +1,23 @@
+{
+  "name": "maestro-workflow",
+  "version": "0.1.0",
+  "description": "Multi-model engineering workflow with MAGI weighted voting and cross-CLI orchestration",
+  "author": {
+    "name": "howar31",
+    "url": "https://github.com/howar31"
+  },
+  "homepage": "https://github.com/howar31/maestro-workflow",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/howar31/maestro-workflow.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "multi-model",
+    "magi",
+    "code-review",
+    "spec-driven",
+    "claude-code"
+  ]
+}

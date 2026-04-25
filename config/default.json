@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/howar31/maestro-workflow/main/config/schema.json",
+  "version": "0.1.0",
+  "xreview": {
+    "reviewers": [
+      {
+        "cli": "claude",
+        "model": "opus",
+        "weight": 2,
+        "required": true
+      },
+      {
+        "cli": "gemini",
+        "model": "default",
+        "weight": 1,
+        "required": false
+      },
+      {
+        "cli": "codex",
+        "model": "default",
+        "weight": 1,
+        "required": false
+      }
+    ],
+    "magi": {
+      "mode": "majority",
+      "threshold": null,
+      "degraded_mode": "warn_user"
+    },
+    "fallback_policy": "lenient",
+    "min_successful_reviewers": 1,
+    "timeout_seconds": 3000,
+    "quota_error_patterns": {
+      "claude": ["rate_limit", "quota_exceeded"],
+      "gemini": ["RESOURCE_EXHAUSTED", "quota", "429"],
+      "codex": ["rate_limit", "quota", "429"]
+    },
+    "auth_error_patterns": {
+      "claude": ["unauthorized", "authentication"],
+      "gemini": ["unauthorized", "401", "permission denied"],
+      "codex": ["unauthorized", "401"]
+    }
+  },
+  "node": {
+    "use_nvm": true,
+    "default_version": "22",
+    "cli_paths": {}
+  },
+  "output_language": "zh-TW"
+}
