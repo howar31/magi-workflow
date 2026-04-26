@@ -217,7 +217,7 @@ if [[ "$SPRINT_WORKS" == true && "$SPRINT_TASKS" == false ]]; then
 fi
 
 # ── Compute allowed/disallowed skills for this state ──────────────────────
-ALL_SKILLS=(magi.help magi.setup magi.init magi.plan magi.tasks magi.review-plan magi.go magi.review-code magi.commit magi.yolo magi.web.frontend.spec magi.web.backend.spec magi.web.infra.plan magi.web.ci.spec)
+ALL_SKILLS=(magi.help magi.state magi.setup magi.init magi.plan magi.tasks magi.review-plan magi.go magi.review-code magi.commit magi.yolo magi.web.frontend.spec magi.web.backend.spec magi.web.infra.plan magi.web.ci.spec)
 
 ALLOWED_JSON="[]"
 DISALLOWED_JSON="{}"
@@ -233,6 +233,9 @@ disallow() {
 
 # magi.help: always allowed (read-only quick reference, must work in BOOTSTRAP too)
 allow "magi.help"
+
+# magi.state: always allowed (read-only terse state printer, must work in BOOTSTRAP too)
+allow "magi.state"
 
 # magi.setup: always allowed (per-user config wizard)
 allow "magi.setup"

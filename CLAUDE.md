@@ -25,6 +25,7 @@ Every command does a **state preflight** via `scripts/shared/detect-state.sh` an
 | Command | Role | Mandatory? | Pauses for user? |
 |---------|------|------------|-------------------|
 | `/magi.help` | Quick reference: command roster (pulled live from each SKILL.md), workflow diagram, subagents, common flags. Appends a state-aware next-step hint when run inside a magi project. `/magi.help <name>` prints details for one command. Always allowed regardless of state | any time | no |
+| `/magi.state` | Terse current-state + next-step printer (3–6 lines). Subset of `/magi.help` Section E without the roster, diagram, subagent or flag list — for quick orientation when you're mid-flow. Always allowed regardless of state | any time | no |
 | `/magi.setup` | First-run onboarding: healthcheck CLIs, write `~/.config/magi-workflow/config.json`, dry-run | once per machine | yes (interactive) |
 | `/magi.init` | One-time project bootstrap: scaffolds missing root CLAUDE/README/SPEC + docs/PRD/TECHSTACK/BACKLOG. Idempotent | once per project | yes (per-file confirm) |
 | `/magi.plan` | **Smart dispatcher**: classifies type (feat/fix/hotfix/refactor/chore/docs/perf/test/style/ci) + scale (trivial/minor/major) and routes to PLAN.md / SPEC.md / TICKET.md / HOTFIX.md / no-artifact. Bare invocation reads `docs/BACKLOG.md` Pending entries | per change | yes (confirm classification + doc) |
@@ -128,6 +129,25 @@ Every `skills/magi.review-plan/scripts/adapters/<cli>.sh` must support:
    - `0` ok, `11` skip-quota, `12` skip-auth, `13` skip-missing, `14` skip-empty-final, anything else fail.
 
 Adapters that wrap npm-based CLIs must source `scripts/shared/nvm-exec.sh` and run the CLI under the configured node version (avoids the macOS `/usr/bin/env node` → wrong-shebang trap).
+
+## Plugin versioning
+
+This repo **is** a Claude Code plugin. The `version` field in `.claude-plugin/plugin.json` is the only signal that users' Claude Code installs use to detect updates — bumping it is part of "shipping", not an afterthought.
+
+**When a change ships to users, bump `version` in the same commit:**
+
+| Change | Bump (pre-1.0) |
+|--------|----------------|
+| Bug fix, internal refactor, docs-only that ships with plugin | patch (`0.1.0` → `0.1.1`) |
+| New skill, new flag, new user-visible behavior (backwards-compatible) | minor (`0.1.0` → `0.2.0`) |
+| Removed/renamed command, breaking flag / contract change | minor while pre-1.0; major once ≥ 1.0 |
+| Pure dev/test-only changes not shipped (e.g. `test/`, internal scripts) | **no bump** |
+
+User-visible surfaces (touching any of these = candidate for bump): `skills/`, `agents/`, `commands/`, `scripts/` sourced at runtime, `references/`, root `README.md`, root `CLAUDE.md`, `.claude-plugin/*.json`.
+
+Whoever drives the commit (human or `/magi.commit`) should check the staged diff against the table above and confirm the bump (or explicit skip with reason) before the commit lands.
+
+**Tag (optional but recommended for releases):** `git tag v<MAJOR>.<MINOR>.<PATCH>` and push. Claude Code itself doesn't require the tag — it reads `plugin.json`. Tags exist for GitHub Releases / changelog purposes.
 
 ## Workflow rules
 Do not commit on the user's behalf without explicit confirmation. After completing an implementation, summarise and wait. Use Conventional Commits.
