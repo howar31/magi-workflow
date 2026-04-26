@@ -15,7 +15,7 @@ this is the user's first impression of the workflow.
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow/config.json"
 DEFAULT_CONFIG="$PLUGIN_ROOT/config/default.json"
 ```
 
@@ -69,7 +69,7 @@ this plugin to function. Suggest running `claude login` and re-running.
 For each detected CLI, ask the user (via AskUserQuestion or chat) whether to
 enable it as a reviewer. Default selections:
 
-- `claude`: enabled, `required: true`, `weight: 2`
+- `claude`: enabled, `required: true`, `weight: 1`
 - `gemini`: enabled if healthcheck ok, `required: false`, `weight: 1`
 - `codex`: enabled if healthcheck ok, `required: false`, `weight: 1`
 
@@ -77,8 +77,8 @@ Ask in **one consolidated AskUserQuestion** if possible. Provide the
 "Recommended" defaults so they can accept with one click.
 
 After roster selection, ask for weights only if they want to deviate from
-defaults. Recommend the default ratio (claude:2, others:1) — it ensures
-opus is influential but cannot pass `majority` alone.
+defaults. Recommend keeping all reviewers at `weight: 1` — equal voices
+keep `majority` honest (no single reviewer can pass alone).
 
 ## 4. MAGI mode
 
@@ -157,7 +157,7 @@ End with a short user-facing summary in `output_language`:
 Example output:
 
 ```
-✅ Setup complete. Reviewers: claude:opus (weight 2, required), gemini:default (weight 1).
+✅ Setup complete. Reviewers: claude:opus (weight 1, required), gemini:default (weight 1).
 
 下一步：
   /magi.init    (專案尚未初始化，先建立 root CLAUDE/README/SPEC + docs/ 骨架)

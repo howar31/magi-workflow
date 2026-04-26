@@ -15,7 +15,7 @@ Output goes to the user as plain markdown.
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow/config.json"
 ```
 
 Verify `$PLUGIN_ROOT/skills` is a directory. If not, the plugin is installed
@@ -186,7 +186,7 @@ Mapping (state → suggested next command):
 
 | State | Suggestion |
 |-------|------------|
-| `BOOTSTRAP` | `/magi.init`（`/magi.setup` first if no `~/.config/magi-workflow-workflow/config.json` exists） |
+| `BOOTSTRAP` | `/magi.init`（`/magi.setup` first if no `~/.config/magi-workflow/config.json` exists） |
 | `INITIALIZED` | `/magi.plan "<description>"` 或 bare `/magi.plan` 從 `docs/BACKLOG.md` 選取 |
 | `PLANNING` | `/magi.tasks`（或 hotfix → `/magi.go`；可選 `/magi.review-plan`） |
 | `PLAN_REVIEWED` | `/magi.tasks` |

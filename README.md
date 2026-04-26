@@ -379,7 +379,7 @@ Fresh 模式從 `/magi.plan` 執行至 `/magi.commit`。Resume 模式偵測 spri
 {
   "xreview": {
     "reviewers": [
-      {"cli": "claude", "model": "opus", "weight": 2, "required": true},
+      {"cli": "claude", "model": "opus", "weight": 1, "required": true},
       {"cli": "gemini", "model": "default", "weight": 1, "required": false},
       {"cli": "codex",  "model": "default", "weight": 1, "required": false}
     ],

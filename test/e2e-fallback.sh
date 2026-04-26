@@ -88,7 +88,7 @@ cat >"$TMP_ROOT/config/default.json" <<'CFG'
   "version": "test",
   "xreview": {
     "reviewers": [
-      {"cli": "claude", "model": "opus",    "weight": 2, "required": true},
+      {"cli": "claude", "model": "opus",    "weight": 1, "required": true},
       {"cli": "gemini", "model": "default", "weight": 1, "required": false},
       {"cli": "codex",  "model": "default", "weight": 1, "required": false}
     ],

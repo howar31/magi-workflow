@@ -41,7 +41,7 @@ resolve_config_path() {
     echo "$MAGI_CONFIG_PATH"
     return 0
   fi
-  local user_config="$HOME/.config/magi-workflow-workflow/config.json"
+  local user_config="$HOME/.config/magi-workflow/config.json"
   if [[ -f "$user_config" ]]; then
     echo "$user_config"
     return 0

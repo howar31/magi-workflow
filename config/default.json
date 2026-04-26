@@ -6,7 +6,7 @@
       {
         "cli": "claude",
         "model": "opus",
-        "weight": 2,
+        "weight": 1,
         "required": true
       },
       {

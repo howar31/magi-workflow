@@ -178,7 +178,7 @@ This avoids the macOS pitfall where `gemini`'s shebang `#!/usr/bin/env node` res
 {
   "xreview": {
     "reviewers": [
-      {"cli": "claude", "model": "opus", "weight": 2, "required": true},
+      {"cli": "claude", "model": "opus", "weight": 1, "required": true},
       {"cli": "gemini", "model": "default", "weight": 1, "required": false},
       {"cli": "codex",  "model": "default", "weight": 1, "required": false}
     ],
@@ -663,7 +663,7 @@ the path the skill chooses — closing the session does not roll them back.
 | Skill | Writes to | Persists after session? |
 |-------|-----------|--------------------------|
 | `/magi.help` | nothing | — |
-| `/magi.setup` | `~/.config/magi-workflow-workflow/config.json` (global, per-user) | **yes (global)** |
+| `/magi.setup` | `~/.config/magi-workflow/config.json` (global, per-user) | **yes (global)** |
 | `/magi.init` | `<cwd>/CLAUDE.md`, `README.md`, `SPEC.md`, `docs/PRD.md`, `docs/TECHSTACK.md`, `docs/BACKLOG.md` | **yes (the cwd project)** |
 | `/magi.plan` | `<cwd>/docs/<num>-<slug>/PLAN.md` (or SPEC.md / TICKET.md / HOTFIX.md) | **yes** |
 | `/magi.tasks` | `<cwd>/docs/<num>-<slug>/TASKS.md` | **yes** |
@@ -687,10 +687,10 @@ Safe-test recipes:
 - **`/magi.setup`** (global config) — back up first, or use `--recheck` to
   validate without rewriting:
   ```bash
-  cp -a ~/.config/magi-workflow-workflow ~/.config/magi-workflow-workflow.bak
+  cp -a ~/.config/magi-workflow ~/.config/magi-workflow.bak
   # ...test /magi.setup...
-  rm -rf ~/.config/magi-workflow-workflow \
-    && mv ~/.config/magi-workflow-workflow.bak ~/.config/magi-workflow-workflow
+  rm -rf ~/.config/magi-workflow \
+    && mv ~/.config/magi-workflow.bak ~/.config/magi-workflow
   ```
 
 Rule of thumb: treat `--plugin-dir` as "load my dev code instead of the

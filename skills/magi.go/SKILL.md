@@ -15,7 +15,7 @@ production code yourself.**
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow/config.json"
 ```
 
 If config missing → tell user to run `/magi.setup`.

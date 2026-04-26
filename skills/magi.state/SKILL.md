@@ -20,7 +20,7 @@ only the current state and the suggested next command are needed.
 ```bash
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-}"
 [[ -z "$PLUGIN_ROOT" ]] && PLUGIN_ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." 2>/dev/null && pwd)"
-USER_CONFIG="$HOME/.config/magi-workflow-workflow/config.json"
+USER_CONFIG="$HOME/.config/magi-workflow/config.json"
 ```
 
 Verify `$PLUGIN_ROOT/skills` is a directory. If not, the plugin is
@@ -82,7 +82,7 @@ the same commit:
 
 | State | Suggestion |
 |-------|------------|
-| `BOOTSTRAP` | `/magi.init`（`/magi.setup` first if no `~/.config/magi-workflow-workflow/config.json` exists） |
+| `BOOTSTRAP` | `/magi.init`（`/magi.setup` first if no `~/.config/magi-workflow/config.json` exists） |
 | `INITIALIZED` | `/magi.plan "<description>"` 或 bare `/magi.plan` 從 `docs/BACKLOG.md` 選取 |
 | `PLANNING` | `/magi.tasks`（hotfix → `/magi.go`；可選 `/magi.review-plan` 先 review） |
 | `PLAN_REVIEWED` | `/magi.tasks` |
