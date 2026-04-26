@@ -381,6 +381,12 @@ When the user confirms the document:
 
 5. Do not run anything automatically — every next skill needs the user's explicit slash command.
 
+## Known pitfalls
+
+See `references/LESSONS.md` § /magi:plan for empirical anti-patterns observed
+in real sessions. Read these before drafting to anticipate likely failure
+modes.
+
 ## Conventions
 
 - One artifact per feature: pick exactly one of PLAN.md / SPEC.md /

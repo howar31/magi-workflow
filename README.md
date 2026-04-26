@@ -1,7 +1,7 @@
 # magi-workflow
 
 [![License: MIT](https://img.shields.io/github/license/howar31/magi-workflow?color=blue)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.6.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-v0.7.0-blue)](.claude-plugin/plugin.json)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-CC785C)](https://claude.com/claude-code)
 [![Made with Bash](https://img.shields.io/badge/made%20with-Bash-1f425f?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Conventional Commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow)](https://www.conventionalcommits.org)

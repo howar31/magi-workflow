@@ -198,6 +198,10 @@ Mapping (state → suggested next command):
 Surface any `warnings[]` from `STATE_JSON` after the suggestion (one line
 each, prefixed with the warning's `suggest`).
 
+**Exception — `other_in_progress_sprint`**: render as
+`⚠ Also in progress: <file> (IN_PROGRESS) — <suggest>` where `<file>` is
+the warning's `file` field. Same special case as `/magi:status` § 1.
+
 Format:
 
 ```
@@ -205,6 +209,8 @@ Format:
 建議下一步：<command>
 （如果有 warnings）
 ⚠ <warning.reason> → <warning.suggest>
+（other_in_progress_sprint）
+⚠ Also in progress: <file> (IN_PROGRESS) — <suggest>
 ```
 
 ### Footer

@@ -6,6 +6,11 @@ disable-model-invocation: true
 
 # /magi:go — execute tasks via subagent
 
+> **Enforcement: rigid.** Once /magi:go starts, every step in this skill body
+> must be executed in order. Do not shortcut the developer brief, do not skip
+> WORKS.md updates, do not accept subagent reports without verification.
+> If something blocks you, stop and report — do not improvise around it.
+
 You are the coordinator. Read TASKS.md, dispatch `magi-developer` to do
 the work, collect results, update WORKS.md, and stop. **You do not write
 production code yourself.**
@@ -172,6 +177,22 @@ Run the project test command **once** to confirm nothing else broke.
 If tests fail and the developer reported DONE, that is a regression — go
 back to the user with the failure, do not silently fix.
 
+## 5.5. Verification Pitfalls
+
+The subagent may report DONE without sufficient evidence. Before writing
+to WORKS.md, the following claims require concrete proof:
+
+| Claim | Required evidence in WORKS.md |
+|---|---|
+| Tests pass | Test command, last 3 lines of stdout, exit code 0 |
+| Build works | Build command, exit code 0 |
+| Bug fixed | Reference to the failing test that now passes |
+| Files changed | `git diff --stat` output (file list + line counts) |
+
+Do not use hedging language ("should pass", "seems to work"). If evidence
+is missing, dispatch the subagent again to gather it before recording the
+task as complete.
+
 ## 6. Update WORKS.md
 
 Append a journal entry for the work just completed:
@@ -211,6 +232,12 @@ it's not an optional review like `/magi:review-plan`; it produces
 `DRIFT.md` which `/magi:commit` requires.
 
 **Never commit on the user's behalf.** Wait for explicit instruction.
+
+## Known pitfalls
+
+See `references/LESSONS.md` § /magi:go for empirical anti-patterns observed
+in real sessions. Read these before dispatching to anticipate likely failure
+modes.
 
 ## Argument parsing
 

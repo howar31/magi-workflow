@@ -32,5 +32,8 @@ Per-command contract in `skills/<name>/SKILL.md`. → `SPEC.md §Slash commands`
 - File naming: project SSOT docs uppercase (`PLAN.md`, `SPEC.md`, `TASKS.md`, `WORKS.md`, `DRIFT.md`, `PRD.md`, `TECHSTACK.md`, `BACKLOG.md`); plugin internals kebab-case
 - Language: English for `CLAUDE.md`, `SPEC.md`, `references/`, `skills/**/SKILL.md`, `agents/*.md`; zh-TW for `README.md` and user-facing prompts; English for code comments
 
+## Lessons
+When magi misbehaves in a real session and we have to re-correct Claude's shortcut, add a one-line entry to `references/LESSONS.md` under the relevant skill section. Empirical incidents only — no theoretical "what if" entries.
+
 ## Adapter contract
 → `SPEC.md §Adapter contract`

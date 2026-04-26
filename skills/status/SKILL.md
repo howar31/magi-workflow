@@ -1,7 +1,6 @@
 ---
 name: status
 description: Terse "where am I, what's next" printer for magi-workflow projects. Outputs only the current project state, sprint dir (if any), suggested next command, and any active warnings — typically 3–6 lines. Use this when you're mid-flow and just need a quick orientation; reach for /magi:help when you want the full command roster, workflow diagram, and flag reference.
-disable-model-invocation: true
 ---
 
 # /magi:status — current state + next-step (terse)
@@ -124,6 +123,22 @@ Next:  /magi:init  （若尚未跑過 /magi:setup,先執行 /magi:setup）
 
 Surface every entry from `STATE_JSON.warnings[]` after the suggestion.
 Each warning is two lines: `⚠ <reason>` followed by `   → <suggest>`.
+
+**Exception — `other_in_progress_sprint`**: render as a single line in the
+form `⚠ Also in progress: <file> (IN_PROGRESS) — <suggest>` where `<file>`
+is the warning's `file` field (e.g., `magi/02-foo`). This makes the
+"earlier sprint still has unfinished work" hint visually distinct from
+staleness warnings.
+
+Example (state=CODE_REVIEWED on `03-bar`, with `02-foo` still in progress):
+
+```
+State: CODE_REVIEWED
+Sprint: magi/03-bar
+Next:  /magi:commit
+
+⚠ Also in progress: magi/02-foo (IN_PROGRESS) — /magi:status --sprint 02-foo
+```
 
 ## Conventions
 

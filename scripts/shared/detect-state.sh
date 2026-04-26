@@ -216,6 +216,39 @@ if [[ "$SPRINT_WORKS" == true && "$SPRINT_TASKS" == false ]]; then
     "WORKS.md exists but no TASKS.md found" "/magi:tasks"
 fi
 
+# other_in_progress_sprint: when the current sprint is wound down (or there
+# is no sprint context) but an earlier sprint still has unchecked tasks.
+# Cheap O(n) scan; n typically < 50. Filesystem-derived per project state
+# model — no marker files, no persisted state.
+OTHER_IN_PROGRESS_JSON="[]"
+if [[ -d "magi" ]]; then
+  while IFS= read -r dir; do
+    [[ -n "$dir" ]] || continue
+    [[ "$dir" == "$SPRINT_DIR" ]] && continue
+    [[ -f "$dir/TASKS.md" && -f "$dir/WORKS.md" && ! -f "$dir/DRIFT.md" ]] || continue
+    other_total=$(grep -cE '^- \[[ x]\]' "$dir/TASKS.md" 2>/dev/null) || other_total=0
+    other_done=$(grep -cE '^- \[x\]' "$dir/TASKS.md" 2>/dev/null) || other_done=0
+    if [[ "$other_total" -gt 0 && "$other_done" -lt "$other_total" ]]; then
+      OTHER_IN_PROGRESS_JSON=$(jq --arg d "$dir" '. + [$d]' <<<"$OTHER_IN_PROGRESS_JSON")
+    fi
+  done < <(find magi -mindepth 1 -maxdepth 1 -type d -name '[0-9][0-9]-*' 2>/dev/null | sort)
+fi
+
+# Emit warning only when the current state is wound down AND others are
+# in progress. If current sprint is itself in progress, the user already
+# knows what they're doing — no warning.
+case "$STATE" in
+  WORK_DONE|CODE_REVIEWED|INITIALIZED|BOOTSTRAP)
+    other_count=$(jq 'length' <<<"$OTHER_IN_PROGRESS_JSON")
+    if [[ "$other_count" -gt 0 ]]; then
+      first_other=$(jq -r '.[0]' <<<"$OTHER_IN_PROGRESS_JSON")
+      add_warning "other_in_progress_sprint" "$first_other" \
+        "earlier sprint still in progress" \
+        "/magi:status --sprint $(basename "$first_other")"
+    fi
+    ;;
+esac
+
 # ── Compute allowed/disallowed skills for this state ──────────────────────
 ALL_SKILLS=(help status setup init plan tasks review-plan go review-code commit yolo web-frontend-spec web-backend-spec web-infra-plan web-ci-spec)
 
