@@ -24,6 +24,7 @@ Every command does a **state preflight** via `scripts/shared/detect-state.sh` an
 
 | Command | Role | Mandatory? | Pauses for user? |
 |---------|------|------------|-------------------|
+| `/magi.help` | Quick reference: command roster (pulled live from each SKILL.md), workflow diagram, subagents, common flags. Appends a state-aware next-step hint when run inside a magi project. `/magi.help <name>` prints details for one command. Always allowed regardless of state | any time | no |
 | `/magi.setup` | First-run onboarding: healthcheck CLIs, write `~/.config/magi-workflow/config.json`, dry-run | once per machine | yes (interactive) |
 | `/magi.init` | One-time project bootstrap: scaffolds missing root CLAUDE/README/SPEC + docs/PRD/TECHSTACK/BACKLOG. Idempotent | once per project | yes (per-file confirm) |
 | `/magi.plan` | **Smart dispatcher**: classifies type (feat/fix/hotfix/refactor/chore/docs/perf/test/style/ci) + scale (trivial/minor/major) and routes to PLAN.md / SPEC.md / TICKET.md / HOTFIX.md / no-artifact. Bare invocation reads `docs/BACKLOG.md` Pending entries | per change | yes (confirm classification + doc) |

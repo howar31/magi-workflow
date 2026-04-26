@@ -49,6 +49,7 @@ orchestrator + magi-consensus shell scripts and to the two subagents below.
 
 | Command | Body summary |
 |---------|--------------|
+| `/magi.help [<name> \| --list]` | Read-only quick reference. Bare invocation prints command roster (descriptions pulled live from each `skills/magi.*/SKILL.md` frontmatter), the standard workflow diagram, subagent summary, common override flags, and a state-aware next-step hint via `detect-state.sh` (fail-soft outside a magi project). `/magi.help <name>` prints details for one command. `/magi.help --list` emits the bare command list. Always allowed in any state. |
 | `/magi.setup [--reset \| --recheck]` | Healthcheck CLIs via `preflight.sh`, ask user for reviewer roster + weights + MAGI mode + nvm version + output language, write `~/.config/magi-workflow/config.json`, validate with a tiny dry-run via the orchestrator. |
 | `/magi.init [--all] [--only <list>] [--dry-run]` | One-time, idempotent project bootstrap. Detects missing Tier 1 (`CLAUDE.md` / `README.md` / `SPEC.md`) and Tier 2 (`docs/PRD.md` / `docs/TECHSTACK.md` / `docs/BACKLOG.md`) files; offers minimal scaffolds; never overwrites. |
 | `/magi.plan [slug] "<desc>"` | Resolve `docs/<num>-<slug>/`, read project context (PRD/TECHSTACK/CLAUDE/AGENTS), decide PLAN.md vs SPEC.md, draft, pause for user confirmation. **Bare invocation** (no description argument) reads `docs/BACKLOG.md` `## Pending` entries; user picks a number → that entry seeds the new sprint and is moved to `## Promoted to sprints`. With description argument, BACKLOG.md is fully ignored. |
@@ -245,6 +246,7 @@ magi-workflow has 8 project states derived purely from filesystem inspection. Si
 
 | Skill | Allowed states | Mandatory? |
 |-------|---------------|------------|
+| `magi.help` | All (read-only reference) | any time |
 | `magi.setup` / `magi.init` | All | once each |
 | `magi.plan` | All (warns in BOOTSTRAP) | per change |
 | `magi.tasks` | PLANNING + later | major work only |
@@ -608,9 +610,91 @@ magi-workflow is self-contained: `/magi.commit` does not reference or depend on 
 | Test | What it covers |
 |------|----------------|
 | `test/e2e-fallback.sh` | Mock adapters simulate RETURN / SKIP-quota / SKIP-auth; verifies event counts, `policy_pass=true` under lenient + 1 ok, MAGI degraded warning. Token-free. |
+| `test/e2e-state.sh` | Builds fake project structures covering the 8 states + staleness-warning scenarios, runs `detect-state.sh` against each, and asserts the JSON output. Token-free; pure filesystem + bash/jq. |
 | `test/e2e-smoke.sh` | Real CLIs against a one-sentence prompt; verifies preflight + orchestrator + MAGI report end-to-end. Costs a small number of tokens per reviewer. |
 
 Run `bash -n <script>` to syntax-check any shell file.
+
+### Local plugin testing (dev workflow)
+
+For testing changes to skills / agents / hooks before pushing — no
+marketplace install, no symlink, no settings mutation:
+
+```bash
+# Launch a session with this repo loaded as a plugin
+claude --plugin-dir /opt/projects/magi-workflow
+
+# Inside the session, after editing any SKILL.md / agent / hook:
+/reload-plugins
+```
+
+`--plugin-dir` is **session-scoped only**. It writes nothing to disk
+(`~/.claude/settings.json`, `~/.claude.json`, `~/.claude/plugins/` are all
+untouched) and overrides any same-named plugin already installed via
+marketplace for that one session. Closing the session reverts to the
+normally-installed version automatically. There is no `--no-plugin-dir`
+counterpart because there is nothing persistent to clear.
+
+Multiple plugins may be loaded simultaneously by repeating the flag:
+`claude --plugin-dir ./a --plugin-dir ./b`.
+
+Verification matrix for any new skill:
+
+| Scenario | Command | Expected |
+|----------|---------|----------|
+| Inside repo (state varies) | `/<skill>` | Runs against detected state |
+| Outside any git repo | `cd /tmp && claude --plugin-dir <repo> ; /<skill>` | Skill must fail-soft if it reads `detect-state.sh` (which exits 2 on non-git) |
+| Bogus arg | `/<skill> bogus` | Graceful unknown-arg handling |
+| After edit | edit SKILL.md → `/reload-plugins` → re-run | Picks up changes without restart |
+
+Permanent install paths (for users, not contributors): marketplace
+(`claude plugin marketplace add <user>/<repo>`) or per-project copy into
+`<project>/.claude/`. There is **no** `settings.json` field for declaring
+local plugin paths.
+
+#### Side effects of test runs (NOT sandboxed)
+
+`--plugin-dir` only scopes **where the plugin code is loaded from**. It does
+**not** sandbox the files that skills write at runtime. When a skill calls
+`Write` or shells out, the resulting files land on the real filesystem at
+the path the skill chooses — closing the session does not roll them back.
+
+| Skill | Writes to | Persists after session? |
+|-------|-----------|--------------------------|
+| `/magi.help` | nothing | — |
+| `/magi.setup` | `~/.config/magi-workflow-workflow/config.json` (global, per-user) | **yes (global)** |
+| `/magi.init` | `<cwd>/CLAUDE.md`, `README.md`, `SPEC.md`, `docs/PRD.md`, `docs/TECHSTACK.md`, `docs/BACKLOG.md` | **yes (the cwd project)** |
+| `/magi.plan` | `<cwd>/docs/<num>-<slug>/PLAN.md` (or SPEC.md / TICKET.md / HOTFIX.md) | **yes** |
+| `/magi.tasks` | `<cwd>/docs/<num>-<slug>/TASKS.md` | **yes** |
+| `/magi.review-plan` | `<cwd>/docs/<num>-<slug>/MAGI_PLAN_REVIEW.md` | **yes** |
+| `/magi.go` | `<cwd>/docs/<num>-<slug>/WORKS.md` + edits to actual source files | **yes** |
+| `/magi.review-code` | `<cwd>/docs/<num>-<slug>/{MAGI_CODE_REVIEW,SINGLE_CODE_REVIEW,DRIFT}.md` | **yes** |
+| `/magi.commit` | git index + git history | **yes (in git history)** |
+| `/magi.yolo` | union of plan / tasks / go / review-code / commit | **yes** |
+
+Safe-test recipes:
+
+- **Read-only skills** (`/magi.help`) — run anywhere, no cleanup needed.
+- **Skills that touch project files** (`init` / `plan` / `tasks` / `go` /
+  `review-code` / `commit` / `yolo`) — use a throwaway repo:
+  ```bash
+  mkdir /tmp/magi-test && cd /tmp/magi-test && git init
+  claude --plugin-dir /opt/projects/magi-workflow
+  # ...test...
+  rm -rf /tmp/magi-test   # full cleanup after exit
+  ```
+- **`/magi.setup`** (global config) — back up first, or use `--recheck` to
+  validate without rewriting:
+  ```bash
+  cp -a ~/.config/magi-workflow-workflow ~/.config/magi-workflow-workflow.bak
+  # ...test /magi.setup...
+  rm -rf ~/.config/magi-workflow-workflow \
+    && mv ~/.config/magi-workflow-workflow.bak ~/.config/magi-workflow-workflow
+  ```
+
+Rule of thumb: treat `--plugin-dir` as "load my dev code instead of the
+installed copy" — it does not turn the session into a dry-run. Anything
+the skills are designed to persist will persist.
 
 ## Web-domain skills (Phase D)
 
