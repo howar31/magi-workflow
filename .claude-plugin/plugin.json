@@ -7,10 +7,7 @@
     "url": "https://github.com/howar31"
   },
   "homepage": "https://github.com/howar31/magi-workflow",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/howar31/magi-workflow.git"
-  },
+  "repository": "https://github.com/howar31/magi-workflow.git",
   "license": "MIT",
   "keywords": [
     "workflow",
