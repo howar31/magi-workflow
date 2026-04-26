@@ -13,8 +13,9 @@ Per-command contract in `skills/magi.<name>/SKILL.md`. → `SPEC.md §Slash comm
 ## Project document tiers
 → `SPEC.md §Project document tiers`
 
-## Commit scope
-`/magi.commit` is the single in-project commit path (sprint + standalone). Independent of `~/.claude/skills/commit/`.
+## Commits
+- `/magi.commit` is the single in-project commit path (sprint + standalone). Independent of `~/.claude/skills/commit/`.
+- Before any commit, check whether `.claude-plugin/plugin.json` needs a bump per `SPEC.md §Plugin versioning`. Bump goes in the same commit.
 
 ## Run / test
 ```bash
@@ -33,6 +34,3 @@ Per-command contract in `skills/magi.<name>/SKILL.md`. → `SPEC.md §Slash comm
 
 ## Adapter contract
 → `SPEC.md §Adapter contract`
-
-## Plugin versioning
-→ `SPEC.md §Plugin versioning`
