@@ -16,6 +16,7 @@ Per-command contract in `skills/<name>/SKILL.md`. → `SPEC.md §Slash commands`
 ## Commits
 - `/magi:commit` is the single in-project commit path (sprint + standalone). Independent of `~/.claude/skills/commit/`.
 - Before any commit, check whether `.claude-plugin/plugin.json` needs a bump per `SPEC.md §Plugin versioning`. Bump goes in the same commit.
+  - When bumping, also update the version badge in `README.md` (line near `shields.io/badge/version-vX.Y.Z`) in the same commit.
 
 ## Run / test
 ```bash
