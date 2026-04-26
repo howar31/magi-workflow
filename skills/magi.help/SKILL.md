@@ -102,7 +102,7 @@ The "When" column is a short hand-curated label. Use this fixed mapping
 "Conventions" below for why):
 
 - `magi.help` → any time
-- `magi.state` → any time
+- `magi.status` → any time
 - `magi.setup` → once per machine
 - `magi.init` → once per project
 - `magi.plan` → start of every change
@@ -169,11 +169,11 @@ For the full list see `SPEC.md` § "Override flags".
 
 ### Section E — State-aware next step
 
-<!-- KEEP IN SYNC: skills/magi.state/SKILL.md § Section 1 mapping table -->
+<!-- KEEP IN SYNC: skills/magi.status/SKILL.md § Section 1 mapping table -->
 
 Only render this section when `STATE_JSON` is non-empty. If the user
 only wants this hint without the rest of the overview, point them to
-`/magi.state` — same mapping, 3–6 lines of output.
+`/magi.status` — same mapping, 3–6 lines of output.
 
 ```bash
 state=$(jq -r .state <<<"$STATE_JSON")

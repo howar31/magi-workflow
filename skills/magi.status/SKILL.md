@@ -1,10 +1,10 @@
 ---
-name: magi.state
+name: magi.status
 description: Terse "where am I, what's next" printer for magi-workflow projects. Outputs only the current project state, sprint dir (if any), suggested next command, and any active warnings — typically 3–6 lines. Use this when you're mid-flow and just need a quick orientation; reach for /magi.help when you want the full command roster, workflow diagram, and flag reference.
 disable-model-invocation: true
 ---
 
-# /magi.state — current state + next-step (terse)
+# /magi.status — current state + next-step (terse)
 
 You are the coordinator. This skill is a read-only quick-look printer.
 **Do not modify any files, do not call subagents, do not invoke external
@@ -143,4 +143,4 @@ Each warning is two lines: `⚠ <reason>` followed by `   → <suggest>`.
   state names stay English; parenthetical prose follows `LANG_PREF`.
 - **Always allowed**: this skill works in every project state, including
   BOOTSTRAP and outside a git repo (with the fallback line). Reflected
-  in `scripts/shared/detect-state.sh`'s `allow "magi.state"`.
+  in `scripts/shared/detect-state.sh`'s `allow "magi.status"`.
