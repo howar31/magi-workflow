@@ -90,7 +90,7 @@ back for clarification — give it everything up front:
 You are dispatched to execute the following task(s) in this repo.
 
 ## Sprint
-docs/<num>-<slug>/
+magi/<num>-<slug>/
 
 ## Task(s)
 - Task ID: T1.2

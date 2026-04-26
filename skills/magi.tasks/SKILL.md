@@ -1,6 +1,6 @@
 ---
 name: magi.tasks
-description: Decompose a confirmed PLAN.md or SPEC.md into a TASKS.md milestone+checklist file in the same docs/<num>-<name>/ folder. Coordinator-only — does not write production code. Pauses for user confirmation before allowing /magi.go to start.
+description: Decompose a confirmed PLAN.md or SPEC.md into a TASKS.md milestone+checklist file in the same magi/<num>-<name>/ folder. Coordinator-only — does not write production code. Pauses for user confirmation before allowing /magi.go to start.
 disable-model-invocation: true
 ---
 
@@ -48,10 +48,10 @@ proceed if the user just hits Enter.
 
 ## 1. Locate the sprint
 
-Find the target `docs/<num>-<slug>/` folder:
+Find the target `magi/<num>-<slug>/` folder:
 
 1. If user passed an argument (`/magi.tasks 03-profile-page`), use it.
-2. Otherwise, list `docs/*/` folders sorted by `<num>` desc and ask the user
+2. Otherwise, list `magi/*/` folders sorted by `<num>` desc and ask the user
    to pick. Default to the most recent.
 
 Read the existing `PLAN.md` or `SPEC.md` in the chosen folder. If neither
@@ -59,7 +59,7 @@ exists, tell the user to run `/magi.plan` first.
 
 ## 2. Read context
 
-- `docs/PRD.md`, `docs/TECHSTACK.md` (project-level)
+- `magi/PRD.md`, `magi/TECHSTACK.md` (project-level)
 - `CLAUDE.md`, `AGENTS.md` (root)
 - The PLAN/SPEC for the current sprint
 
@@ -70,7 +70,7 @@ Produce milestones + tasks following this shape (in `output_language`):
 ```markdown
 # Tasks — <Feature Name>
 
-> Source: PLAN.md | SPEC.md   •   Sprint: docs/<num>-<slug>/
+> Source: PLAN.md | SPEC.md   •   Sprint: magi/<num>-<slug>/
 
 ## Milestone 1: <name>
 **Goal:** <one-sentence outcome>
@@ -101,7 +101,7 @@ Produce milestones + tasks following this shape (in `output_language`):
 ## 4. Write the file
 
 ```bash
-sprint_dir="docs/<num>-<slug>"
+sprint_dir="magi/<num>-<slug>"
 echo "<task content>" > "$sprint_dir/TASKS.md"
 ```
 
@@ -123,7 +123,7 @@ Decision:
 Example output:
 
 ```
-✅ TASKS.md written to docs/03-profile-page/TASKS.md
+✅ TASKS.md written to magi/03-profile-page/TASKS.md
 3 milestones, 8 tasks. Lane parallelism on T2.1+T2.2.
 
 下一步：

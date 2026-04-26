@@ -90,7 +90,7 @@ section already exists (perhaps from an earlier iteration), ask before
 overwriting.
 
 ```bash
-sprint_dir="docs/<num>-<slug>"
+sprint_dir="magi/<num>-<slug>"
 # Append the new section to existing SPEC.md
 ```
 

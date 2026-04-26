@@ -151,7 +151,7 @@ End with a short user-facing summary in `output_language`:
   - **BOOTSTRAP** (project lacks Tier 1/2 docs) → `/magi.init` first
   - **INITIALIZED or later** → `/magi.plan "<feature description>"` to
     start a new sprint, or bare `/magi.plan` to pick from
-    `docs/BACKLOG.md`
+    `magi/BACKLOG.md`
   - To re-validate or reset: `/magi.setup --recheck` / `/magi.setup --reset`
 
 Example output:
@@ -160,7 +160,7 @@ Example output:
 ✅ Setup complete. Reviewers: claude:opus (weight 1, required), gemini:default (weight 1).
 
 下一步：
-  /magi.init    (專案尚未初始化，先建立 root CLAUDE/README/SPEC + docs/ 骨架)
+  /magi.init    (專案尚未初始化，先建立 root CLAUDE/README/SPEC + magi/ 骨架)
   /magi.plan    (init 完成後跑這個開始 sprint)
 ```
 

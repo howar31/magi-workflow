@@ -1,6 +1,6 @@
 ---
 name: magi.plan
-description: Smart entry point for any commit-worthy work. Classifies the request by type (feat/fix/hotfix/refactor/chore/docs/perf/test/style/ci) and scale (trivial/minor/major), then routes to the right artifact (PLAN.md / SPEC.md / TICKET.md / HOTFIX.md / no-artifact). Multi-language semantic classification (zh-TW / en / mixed). User can override via flags or interactive confirm. Bare invocation reads docs/BACKLOG.md Pending entries.
+description: Smart entry point for any commit-worthy work. Classifies the request by type (feat/fix/hotfix/refactor/chore/docs/perf/test/style/ci) and scale (trivial/minor/major), then routes to the right artifact (PLAN.md / SPEC.md / TICKET.md / HOTFIX.md / no-artifact). Multi-language semantic classification (zh-TW / en / mixed). User can override via flags or interactive confirm. Bare invocation reads magi/BACKLOG.md Pending entries.
 disable-model-invocation: true
 ---
 
@@ -32,22 +32,22 @@ state=$(jq -r .state <<<"$STATE_JSON")
 
 - **state=BOOTSTRAP** (no root CLAUDE/README/SPEC at all) → warn the user:
   > Project has not been bootstrapped yet. Run `/magi.init` first to
-  > scaffold root docs and `docs/PRD.md` / `docs/TECHSTACK.md` so plans
+  > scaffold root docs and `magi/PRD.md` / `magi/TECHSTACK.md` so plans
   > have project context. Continue anyway? (y/n)
 
   If they say no → exit and let them run `/magi.init`. If yes → proceed
   with whatever inline context they supply.
 
-- **state=INITIALIZED but `docs/PRD.md` or `docs/TECHSTACK.md` missing** →
+- **state=INITIALIZED but `magi/PRD.md` or `magi/TECHSTACK.md` missing** →
   same as before (existing §2 prompt to set them up).
 
 ## 0.5. Backlog awareness (only when no description argument was given)
 
 If the user invoked `/magi.plan` **without** a description argument (and
-without an explicit slug+description form), check for `docs/BACKLOG.md`:
+without an explicit slug+description form), check for `magi/BACKLOG.md`:
 
 ```bash
-[[ -f docs/BACKLOG.md ]] && pending=$(awk '/^## Pending/{flag=1;next} /^## /{flag=0} flag && /^- \[ \]/' docs/BACKLOG.md)
+[[ -f magi/BACKLOG.md ]] && pending=$(awk '/^## Pending/{flag=1;next} /^## /{flag=0} flag && /^- \[ \]/' magi/BACKLOG.md)
 ```
 
 If `## Pending` has any entries:
@@ -55,8 +55,8 @@ If `## Pending` has any entries:
 1. List them numbered to the user, with their source sprint:
    ```
    Backlog 有 N 項待 promote：
-     1. <description>  [from docs/03-foo/DRIFT.md]
-     2. <description>  [from docs/04-bar/DRIFT.md]
+     1. <description>  [from magi/03-foo/DRIFT.md]
+     2. <description>  [from magi/04-bar/DRIFT.md]
      ...
 
    選一項當下個 sprint 起點？(輸入編號 / 輸入新 description / Enter 跳過 backlog)
@@ -65,18 +65,18 @@ If `## Pending` has any entries:
 2. Branch on user input:
    - **Number** → take that entry's description as the seed for this
      sprint. Continue with §1 below using that description. **After §4
-     finishes writing the sprint folder**, edit `docs/BACKLOG.md`:
+     finishes writing the sprint folder**, edit `magi/BACKLOG.md`:
      - Remove the line from `## Pending`
      - Add to `## Promoted to sprints` (create the section if missing) as:
        ```markdown
-       - ~~<description>~~ → `docs/<num>-<slug>/` (<YYYY-MM-DD>)
+       - ~~<description>~~ → `magi/<num>-<slug>/` (<YYYY-MM-DD>)
        ```
    - **Free text** → treat as a normal description argument; **leave
      BACKLOG.md untouched**.
    - **Empty (Enter)** → exit; don't create a sprint. Tell the user "no
      sprint started; backlog left as-is".
 
-If `docs/BACKLOG.md` doesn't exist or `## Pending` is empty, fall through
+If `magi/BACKLOG.md` doesn't exist or `## Pending` is empty, fall through
 to "what would you like to plan?" — same as no-arg behavior before this
 upgrade.
 
@@ -152,7 +152,7 @@ PLAN for exploratory phase, SPEC when requirements are clear.
 Show the classification and let user adjust before any file is written:
 
 ```
-識別為：feat / minor → 將建立 TICKET.md，路徑 docs/03-search-pagination/TICKET.md
+識別為：feat / minor → 將建立 TICKET.md，路徑 magi/03-search-pagination/TICKET.md
 
 不對？輸入：
   - 修正 type（如 'fix' / 'refactor' / 'hotfix'）
@@ -175,13 +175,13 @@ Loop until user confirms or specifies an artifact.
 
 ## 1. Resolve the sprint folder
 
-The convention: every feature lives in `docs/<num>-<slug>/`.
+The convention: every feature lives in `magi/<num>-<slug>/`.
 
 1. If the user supplied a path or slug as an argument prefix (e.g.,
    `/magi.plan profile-page "<details>"`), use it as the slug.
 2. Otherwise infer a kebab-case slug from the description (max 4 words).
-3. Pick `<num>` as max(existing sprint numbers in `docs/`) + 1, zero-padded
-   to 2 digits (e.g. `03-profile-page`). If `docs/` does not exist yet,
+3. Pick `<num>` as max(existing sprint numbers in `magi/`) + 1, zero-padded
+   to 2 digits (e.g. `03-profile-page`). If `magi/` does not exist yet,
    create it and start at `01`.
 
 Confirm the resolved path with the user before creating files.
@@ -190,12 +190,12 @@ Confirm the resolved path with the user before creating files.
 
 If they exist, read:
 
-- `docs/PRD.md` — product requirements (project-level)
-- `docs/TECHSTACK.md` — language, framework, deployment constraints
+- `magi/PRD.md` — product requirements (project-level)
+- `magi/TECHSTACK.md` — language, framework, deployment constraints
 - `CLAUDE.md` / `AGENTS.md` (root) — project conventions
 
-If none exist, ask the user once whether they want to set up `docs/PRD.md`
-and `docs/TECHSTACK.md` first (offer a brief template). If they decline,
+If none exist, ask the user once whether they want to set up `magi/PRD.md`
+and `magi/TECHSTACK.md` first (offer a brief template). If they decline,
 proceed with whatever context the user supplies inline.
 
 ## 3. Draft the document
@@ -318,19 +318,19 @@ Hotfix special semantics:
 ## 4. Write the document
 
 ```bash
-mkdir -p "docs/<num>-<slug>"
+mkdir -p "magi/<num>-<slug>"
 # Write PLAN.md or SPEC.md
 ```
 
 If this sprint was started by **picking a backlog entry** in §0.5, after
-the sprint folder is created, also update `docs/BACKLOG.md`:
+the sprint folder is created, also update `magi/BACKLOG.md`:
 
 - Remove the chosen entry's line (and its `> from ...` source line) from
   `## Pending`
 - Append under `## Promoted to sprints` (create the section if it doesn't
   exist):
   ```markdown
-  - ~~<original description>~~ → `docs/<num>-<slug>/` (<YYYY-MM-DD>)
+  - ~~<original description>~~ → `magi/<num>-<slug>/` (<YYYY-MM-DD>)
   ```
 
 After writing, **stop and ask the user to confirm**. Do not auto-trigger
@@ -342,7 +342,7 @@ If the user wants edits, iterate until they confirm.
 
 When the user confirms the document:
 
-1. **Detect web-domain scope** — scan the drafted PLAN/SPEC + `docs/TECHSTACK.md` (if it exists) for keywords (case-insensitive, match whole words / phrases, not substrings):
+1. **Detect web-domain scope** — scan the drafted PLAN/SPEC + `magi/TECHSTACK.md` (if it exists) for keywords (case-insensitive, match whole words / phrases, not substrings):
 
    | Domain | Trigger keywords | Suggested skill |
    |--------|-----------------|----------------|
@@ -398,7 +398,7 @@ When the user confirms the document:
 
 The command form:
 - `/magi.plan` (no args) — backlog-aware mode (see §0.5). Lists `## Pending`
-  entries from `docs/BACKLOG.md`; user picks one or types a new
+  entries from `magi/BACKLOG.md`; user picks one or types a new
   description.
 - `/magi.plan "<description>"` — direct mode. Plans the described feature;
   **does not read or modify BACKLOG.md**.
@@ -408,7 +408,7 @@ Flags:
 
 - `--model <name>` — override Coordinator model for this invocation
   (rarely needed; main session model is the default).
-- `--into docs/<existing-num>-<slug>/` — write into an existing sprint
+- `--into magi/<existing-num>-<slug>/` — write into an existing sprint
   folder instead of creating a new one (use sparingly; meant for plan
   iteration on the same feature).
 

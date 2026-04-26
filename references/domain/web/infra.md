@@ -163,7 +163,7 @@ Document which of these run in CI vs locally vs out-of-band.
 ## Deliverable
 
 `/magi.web.infra.plan` produces a sprint file:
-`docs/<num>-<slug>/INFRA.md`:
+`magi/<num>-<slug>/INFRA.md`:
 
 ```markdown
 # Infra plan — <feature name>

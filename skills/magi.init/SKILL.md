@@ -1,6 +1,6 @@
 ---
 name: magi.init
-description: One-time, idempotent project bootstrap. Detects which magi-workflow project files are missing (root CLAUDE/README/SPEC, docs/PRD/TECHSTACK/BACKLOG) and offers to scaffold them. Never overwrites existing files. Run once when adopting magi-workflow on a new or existing project. Safe to re-run.
+description: One-time, idempotent project bootstrap. Detects which magi-workflow project files are missing (root CLAUDE/README/SPEC, magi/PRD/TECHSTACK/BACKLOG) and offers to scaffold them. Never overwrites existing files. Run once when adopting magi-workflow on a new or existing project. Safe to re-run.
 disable-model-invocation: true
 ---
 
@@ -34,9 +34,9 @@ Check existence of each well-known project file:
 | `CLAUDE.md` | 1 (root) | AI agent entry / instructions index |
 | `README.md` | 1 (root) | Human-readable project description |
 | `SPEC.md` | 1 (root) | Architecture & feature spec for AI agents |
-| `docs/PRD.md` | 2 (`docs/`) | Product requirements |
-| `docs/TECHSTACK.md` | 2 (`docs/`) | Tech stack constraints |
-| `docs/BACKLOG.md` | 2 (`docs/`) | Pending items promoted from sprint DRIFT.md |
+| `magi/PRD.md` | 2 (`magi/`) | Product requirements |
+| `magi/TECHSTACK.md` | 2 (`magi/`) | Tech stack constraints |
+| `magi/BACKLOG.md` | 2 (`magi/`) | Pending items promoted from sprint DRIFT.md |
 
 Build two lists:
 - **missing** — files that don't exist
@@ -121,7 +121,7 @@ Project-wide instructions for AI agents working in this repo.
 
 ## Documentation
 - [SPEC.md](SPEC.md) — architecture and feature spec
-- `docs/` — PRD, TECHSTACK, BACKLOG, sprint folders
+- `magi/` — PRD, TECHSTACK, BACKLOG, sprint folders
 
 ## License
 <license name>
@@ -151,7 +151,7 @@ Architecture and feature spec, kept in sync with the codebase. Updated by
 <one paragraph: what's done, what's in progress>.
 ```
 
-### `docs/PRD.md` (Tier 2)
+### `magi/PRD.md` (Tier 2)
 
 ```markdown
 # PRD — <Project Name>
@@ -173,7 +173,7 @@ Architecture and feature spec, kept in sync with the codebase. Updated by
 <how we will know this project is succeeding>.
 ```
 
-### `docs/TECHSTACK.md` (Tier 2)
+### `magi/TECHSTACK.md` (Tier 2)
 
 ```markdown
 # Tech stack
@@ -197,7 +197,7 @@ Architecture and feature spec, kept in sync with the codebase. Updated by
 - <license / compliance / performance constraints AI agents should respect>
 ```
 
-### `docs/BACKLOG.md` (Tier 2)
+### `magi/BACKLOG.md` (Tier 2)
 
 ```markdown
 # Backlog
@@ -230,7 +230,7 @@ Show a summary:
 Created:
   - CLAUDE.md
   - README.md
-  - docs/PRD.md
+  - magi/PRD.md
   ...
 
 Skipped (already existed):
@@ -238,7 +238,7 @@ Skipped (already existed):
   ...
 
 Skipped (user declined):
-  - docs/TECHSTACK.md
+  - magi/TECHSTACK.md
   ...
 ```
 
@@ -250,13 +250,13 @@ project is ready to start its first sprint:
 
 下一步：
   /magi.plan "<功能描述>"     (開始第一個 sprint)
-  /magi.plan                  (乾跑：從 docs/BACKLOG.md 挑既有項目)
+  /magi.plan                  (乾跑：從 magi/BACKLOG.md 挑既有項目)
 
-Tip: 先把 docs/PRD.md 與 docs/TECHSTACK.md 補完，/magi.plan 會用得到。
+Tip: 先把 magi/PRD.md 與 magi/TECHSTACK.md 補完，/magi.plan 會用得到。
 ```
 
 Suggestions by scenario:
-- If `docs/PRD.md` was just scaffolded → suggest user fill it in before
+- If `magi/PRD.md` was just scaffolded → suggest user fill it in before
   `/magi.plan`.
 - If everything (or most things) already existed → suggest `/magi.plan` to
   start a sprint.
@@ -266,7 +266,7 @@ Suggestions by scenario:
 - `--all` — auto-create all missing files; skip per-file prompts. Useful in
   CI or when you want a one-shot bootstrap.
 - `--only <file1,file2>` — restrict to a subset (e.g.,
-  `--only docs/BACKLOG.md`). Comma-separated list of paths from the table
+  `--only magi/BACKLOG.md`). Comma-separated list of paths from the table
   in §1.
 - `--dry-run` — print what would be created without writing anything.
 
@@ -278,5 +278,5 @@ Suggestions by scenario:
   magi-workflow commands) fills in the substance. magi.init's job is to
   create the *anchor* for future work, not to author content.
 - **Per-feature files** (PLAN/SPEC/TASKS/WORKS/DRIFT inside
-  `docs/<num>-<slug>/`) are NOT bootstrapped here — those are created by
+  `magi/<num>-<slug>/`) are NOT bootstrapped here — those are created by
   `/magi.plan` per sprint.

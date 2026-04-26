@@ -44,7 +44,7 @@ For each new file: read it end-to-end and ask "does this need to exist?"
 ## Drift from contract (when a sprint context is provided)
 
 If the coordinator's brief includes a `## Acceptance criteria` or full
-`PLAN.md` / `SPEC.md` from `docs/<num>-<slug>/`, you must additionally
+`PLAN.md` / `SPEC.md` from `magi/<num>-<slug>/`, you must additionally
 compare the diff against that contract and classify any deviations:
 
 | Class | Definition | Examples |

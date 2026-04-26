@@ -7,7 +7,7 @@ disable-model-invocation: true
 # /magi.web.ci.spec — CI/CD elaboration
 
 You are the coordinator. Plan a CI/CD pipeline change and capture the
-analysis in `docs/<num>-<slug>/CI.md`. **You never push to the workflow,
+analysis in `magi/<num>-<slug>/CI.md`. **You never push to the workflow,
 trigger a deploy, or rotate a secret.** Read
 `references/domain/web/ci-cd.md` before starting.
 
@@ -153,8 +153,8 @@ How will the user validate this change before merging?
 
 Based on the section above, generate a draft workflow file:
 
-- GHA: `docs/<num>-<slug>/.github/workflows/<name>.yml`
-- Cloud Build: `docs/<num>-<slug>/cloudbuild-<name>.yaml`
+- GHA: `magi/<num>-<slug>/.github/workflows/<name>.yml`
+- Cloud Build: `magi/<num>-<slug>/cloudbuild-<name>.yaml`
 - etc.
 
 The path is **inside the doc dir** so it does not pollute the project's

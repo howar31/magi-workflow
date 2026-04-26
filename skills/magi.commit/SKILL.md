@@ -54,7 +54,7 @@ Decide between **Sprint mode** and **Standalone mode** by inspecting:
 
 ```bash
 # Find the most recent sprint folder
-sprint_dir=$(ls -d docs/[0-9]*-*/ 2>/dev/null | sort -r | head -1)
+sprint_dir=$(ls -d magi/[0-9]*-*/ 2>/dev/null | sort -r | head -1)
 [[ -n "$sprint_dir" ]] && sprint_dir="${sprint_dir%/}"
 
 # Capture changed files
@@ -97,7 +97,7 @@ Tell the user the chosen mode before proceeding.
 
    b. **C class — out-of-scope observations**: for each `## C.` item, ask
       `(y升級到 backlog / n忽略)`:
-      - `y` → append to `docs/BACKLOG.md` under `## Pending` (create file if
+      - `y` → append to `magi/BACKLOG.md` under `## Pending` (create file if
         missing) with this format:
         ```markdown
         - [ ] <description>
@@ -260,7 +260,7 @@ error and let the user decide.
 After a successful commit:
 
 - If C items were upgraded to backlog in §2a-b, remind the user:
-  > N item(s) added to `docs/BACKLOG.md`. Run `/magi.plan` (no args) to
+  > N item(s) added to `magi/BACKLOG.md`. Run `/magi.plan` (no args) to
   > pick one as your next sprint, or `/magi.plan "<new feature>"` to plan
   > something else.
 

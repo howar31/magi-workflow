@@ -77,7 +77,7 @@ Following `references/domain/web/backend.md` "Deliverable" structure:
 
 ### a. API contract — write SCHEMA FIRST
 
-For REST: produce an OpenAPI excerpt (inline, or as `docs/<num>-<slug>/openapi.yaml`).
+For REST: produce an OpenAPI excerpt (inline, or as `magi/<num>-<slug>/openapi.yaml`).
 For GraphQL: SDL excerpt.
 
 Cover the fields in the reference's "Contract review checklist":
@@ -139,8 +139,8 @@ What's unresolved?
 Append under `## Backend` top-level heading. If a Backend section exists,
 ask before overwriting / merging.
 
-If the API contract is large, write it to `docs/<num>-<slug>/openapi.yaml` or
-`docs/<num>-<slug>/schema.graphql` and link from SPEC.md.
+If the API contract is large, write it to `magi/<num>-<slug>/openapi.yaml` or
+`magi/<num>-<slug>/schema.graphql` and link from SPEC.md.
 
 ## 6. Optional: scaffold contract test
 

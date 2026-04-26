@@ -88,7 +88,7 @@ You are dispatched to review this change set.
 - Conventions: CLAUDE.md / AGENTS.md (root)
 
 ## Sprint contract (if a sprint context exists)
-<verbatim PLAN.md and/or SPEC.md from docs/<num>-<slug>/>
+<verbatim PLAN.md and/or SPEC.md from magi/<num>-<slug>/>
 
 ## Acceptance criteria (if applicable)
 <from current sprint's SPEC.md if exists>
@@ -122,7 +122,7 @@ You are reviewing a software change. Apply skepticism and domain expertise.
 <from CLAUDE.md / AGENTS.md / TECHSTACK.md>
 
 ## Sprint contract (if a sprint context exists)
-<verbatim PLAN.md and/or SPEC.md from docs/<num>-<slug>/>
+<verbatim PLAN.md and/or SPEC.md from magi/<num>-<slug>/>
 
 ## Acceptance criteria
 <from sprint SPEC.md if applicable>

@@ -187,7 +187,7 @@ Mapping (state → suggested next command):
 | State | Suggestion |
 |-------|------------|
 | `BOOTSTRAP` | `/magi.init`（`/magi.setup` first if no `~/.config/magi-workflow/config.json` exists） |
-| `INITIALIZED` | `/magi.plan "<description>"` 或 bare `/magi.plan` 從 `docs/BACKLOG.md` 選取 |
+| `INITIALIZED` | `/magi.plan "<description>"` 或 bare `/magi.plan` 從 `magi/BACKLOG.md` 選取 |
 | `PLANNING` | `/magi.tasks`（或 hotfix → `/magi.go`；可選 `/magi.review-plan`） |
 | `PLAN_REVIEWED` | `/magi.tasks` |
 | `TASKS_READY` | `/magi.go` |

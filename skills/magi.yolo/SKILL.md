@@ -207,7 +207,7 @@ prompts auto-resolved:
 | Decision | Yolo behavior |
 |----------|---------------|
 | A class drift backfill (per item) | **auto-IGNORE** (kept in DRIFT.md, PLAN/SPEC unchanged — agent does not silently modify the contract under no supervision) |
-| C class drift promotion (per item) | **auto-PROMOTE** to `docs/BACKLOG.md` Pending (append-only, safe) |
+| C class drift promotion (per item) | **auto-PROMOTE** to `magi/BACKLOG.md` Pending (append-only, safe) |
 | Root doc sync detection | **auto-SKIP** (root docs not modified by yolo — touching them needs supervision) |
 | Commit message | main agent generates Conventional Commits message from PLAN/SPEC/TICKET title + work summary; not reviewed |
 
@@ -251,7 +251,7 @@ Print to user a one-screen summary:
   ✅ commit: <short-sha> "<message>"
   ⏭️  push: not requested (use --push next time, or git push manually)
 
-Audit log: docs/<sprint>/YOLO_LOG.md
+Audit log: magi/<sprint>/YOLO_LOG.md
 ```
 
 For aborts:
@@ -260,11 +260,11 @@ For aborts:
 🛑 yolo ABORTED at review-code — verdict REQUEST-CHANGES (3 critical issues)
 
 Recovery:
-  1. Read docs/<sprint>/MAGI_CODE_REVIEW.md
+  1. Read magi/<sprint>/MAGI_CODE_REVIEW.md
   2. Fix critical items via /magi.go
   3. /magi.review-code, /magi.commit
 
-State preserved at: docs/<sprint>/
+State preserved at: magi/<sprint>/
 ```
 
 ## Argument parsing

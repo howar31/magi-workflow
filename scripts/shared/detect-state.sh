@@ -48,20 +48,20 @@ file_exists() { [[ -f "$1" ]] && echo true || echo false; }
 ROOT_CLAUDE=$(file_exists "CLAUDE.md")
 ROOT_README=$(file_exists "README.md")
 ROOT_SPEC=$(file_exists "SPEC.md")
-DOCS_PRD=$(file_exists "docs/PRD.md")
-DOCS_TECHSTACK=$(file_exists "docs/TECHSTACK.md")
-DOCS_BACKLOG=$(file_exists "docs/BACKLOG.md")
+MAGI_PRD=$(file_exists "magi/PRD.md")
+MAGI_TECHSTACK=$(file_exists "magi/TECHSTACK.md")
+MAGI_BACKLOG=$(file_exists "magi/BACKLOG.md")
 
 # ── Locate sprint folder (latest by num, or override) ─────────────────────
 SPRINT_DIR=""
 if [[ -n "$SPRINT_OVERRIDE" ]]; then
-  if [[ -d "docs/$SPRINT_OVERRIDE" ]]; then
-    SPRINT_DIR="docs/$SPRINT_OVERRIDE"
+  if [[ -d "magi/$SPRINT_OVERRIDE" ]]; then
+    SPRINT_DIR="magi/$SPRINT_OVERRIDE"
   fi
 else
-  # Find latest docs/<num>-<slug>/ by sorting numeric prefix
-  if [[ -d "docs" ]]; then
-    SPRINT_DIR=$(find docs -mindepth 1 -maxdepth 1 -type d -name '[0-9][0-9]-*' 2>/dev/null \
+  # Find latest magi/<num>-<slug>/ by sorting numeric prefix
+  if [[ -d "magi" ]]; then
+    SPRINT_DIR=$(find magi -mindepth 1 -maxdepth 1 -type d -name '[0-9][0-9]-*' 2>/dev/null \
       | sort -r | head -1)
   fi
 fi
@@ -346,9 +346,9 @@ jq -n \
   --argjson root_claude "$ROOT_CLAUDE" \
   --argjson root_readme "$ROOT_README" \
   --argjson root_spec "$ROOT_SPEC" \
-  --argjson docs_prd "$DOCS_PRD" \
-  --argjson docs_techstack "$DOCS_TECHSTACK" \
-  --argjson docs_backlog "$DOCS_BACKLOG" \
+  --argjson magi_prd "$MAGI_PRD" \
+  --argjson magi_techstack "$MAGI_TECHSTACK" \
+  --argjson magi_backlog "$MAGI_BACKLOG" \
   --argjson sprint_plan "$SPRINT_PLAN" \
   --argjson sprint_spec "$SPRINT_SPEC" \
   --argjson sprint_ticket "$SPRINT_TICKET" \
@@ -371,9 +371,9 @@ jq -n \
       root_claude: $root_claude,
       root_readme: $root_readme,
       root_spec: $root_spec,
-      docs_prd: $docs_prd,
-      docs_techstack: $docs_techstack,
-      docs_backlog: $docs_backlog,
+      magi_prd: $magi_prd,
+      magi_techstack: $magi_techstack,
+      magi_backlog: $magi_backlog,
       sprint_plan: $sprint_plan,
       sprint_spec: $sprint_spec,
       sprint_ticket: $sprint_ticket,

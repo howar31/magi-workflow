@@ -57,7 +57,7 @@ domain expertise. Your output must be structured for downstream
 consensus aggregation.
 
 [Project context]
-- TECHSTACK: see docs/TECHSTACK.md (read it)
+- TECHSTACK: see magi/TECHSTACK.md (read it)
 - Conventions: see CLAUDE.md / AGENTS.md (read if available)
 
 [Document under review]
@@ -139,7 +139,7 @@ Write to `<sprint_dir>/MAGI_PLAN_REVIEW.md` in `output_language`:
 ```markdown
 # 🧠 MAGI Plan Review — <Feature Name>
 
-**Sprint:** docs/<num>-<slug>/ • **Document:** PLAN.md | SPEC.md
+**Sprint:** magi/<num>-<slug>/ • **Document:** PLAN.md | SPEC.md
 **Mode:** <mode>  •  **OK weight:** <ok_weight> / <total_weight>
 **Threshold:** <threshold_value>  •  **Degraded:** yes | no
 

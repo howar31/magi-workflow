@@ -56,7 +56,7 @@ cleanup() {
 }
 
 # ── Case 1: BOOTSTRAP ────────────────────────────────────────────────────
-echo "=== Case 1: BOOTSTRAP (no root docs, no docs/) ==="
+echo "=== Case 1: BOOTSTRAP (no root docs, no magi/) ==="
 T=$(make_repo)
 JSON=$(run_in "$T")
 assert_eq "state" "BOOTSTRAP" "$(jq -r .state <<<"$JSON")"
@@ -83,11 +83,11 @@ cleanup "$T"
 echo "=== Case 3: PLANNING (sprint with PLAN.md, no TASKS) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
 JSON=$(run_in "$T")
 assert_eq "state" "PLANNING" "$(jq -r .state <<<"$JSON")"
-assert_eq "sprint_dir" "docs/01-foo" "$(jq -r .sprint_dir <<<"$JSON")"
+assert_eq "sprint_dir" "magi/01-foo" "$(jq -r .sprint_dir <<<"$JSON")"
 assert_eq "magi.tasks allowed" "true" "$(jq -r '.allowed_skills | index("magi.tasks") != null' <<<"$JSON")"
 assert_eq "magi.go disallowed (no TASKS)" "true" "$(jq -r '.disallowed_skills["magi.go"] != null' <<<"$JSON")"
 assert_eq "magi.web.backend allowed" "true" "$(jq -r '.allowed_skills | index("magi.web.backend.spec") != null' <<<"$JSON")"
@@ -97,9 +97,9 @@ cleanup "$T"
 echo "=== Case 4: PLAN_REVIEWED (sprint with MAGI_PLAN_REVIEW.md) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-echo "# Review" > "$T/docs/01-foo/MAGI_PLAN_REVIEW.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+echo "# Review" > "$T/magi/01-foo/MAGI_PLAN_REVIEW.md"
 JSON=$(run_in "$T")
 assert_eq "state" "PLAN_REVIEWED" "$(jq -r .state <<<"$JSON")"
 cleanup "$T"
@@ -108,9 +108,9 @@ cleanup "$T"
 echo "=== Case 5: TASKS_READY (PLAN + TASKS, no WORKS) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-printf "## M1\n- [ ] T1.1 — foo\n- [ ] T1.2 — bar\n" > "$T/docs/01-foo/TASKS.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+printf "## M1\n- [ ] T1.1 — foo\n- [ ] T1.2 — bar\n" > "$T/magi/01-foo/TASKS.md"
 JSON=$(run_in "$T")
 assert_eq "state" "TASKS_READY" "$(jq -r .state <<<"$JSON")"
 assert_eq "tasks_total" "2" "$(jq -r .tasks_total <<<"$JSON")"
@@ -122,10 +122,10 @@ cleanup "$T"
 echo "=== Case 6: IN_PROGRESS (TASKS + WORKS, partial done) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-printf "## M1\n- [x] T1.1 — foo\n- [ ] T1.2 — bar\n" > "$T/docs/01-foo/TASKS.md"
-echo "# Works" > "$T/docs/01-foo/WORKS.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+printf "## M1\n- [x] T1.1 — foo\n- [ ] T1.2 — bar\n" > "$T/magi/01-foo/TASKS.md"
+echo "# Works" > "$T/magi/01-foo/WORKS.md"
 JSON=$(run_in "$T")
 assert_eq "state" "IN_PROGRESS" "$(jq -r .state <<<"$JSON")"
 assert_eq "tasks_done" "1" "$(jq -r .tasks_done <<<"$JSON")"
@@ -135,10 +135,10 @@ cleanup "$T"
 echo "=== Case 7: WORK_DONE (all tasks checked) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-printf "## M1\n- [x] T1.1 — foo\n- [x] T1.2 — bar\n" > "$T/docs/01-foo/TASKS.md"
-echo "# Works" > "$T/docs/01-foo/WORKS.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+printf "## M1\n- [x] T1.1 — foo\n- [x] T1.2 — bar\n" > "$T/magi/01-foo/TASKS.md"
+echo "# Works" > "$T/magi/01-foo/WORKS.md"
 JSON=$(run_in "$T")
 assert_eq "state" "WORK_DONE" "$(jq -r .state <<<"$JSON")"
 cleanup "$T"
@@ -147,11 +147,11 @@ cleanup "$T"
 echo "=== Case 8: CODE_REVIEWED (sprint with DRIFT.md) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-printf "## M1\n- [x] T1.1 — foo\n" > "$T/docs/01-foo/TASKS.md"
-echo "# Works" > "$T/docs/01-foo/WORKS.md"
-echo "# Drift" > "$T/docs/01-foo/DRIFT.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+printf "## M1\n- [x] T1.1 — foo\n" > "$T/magi/01-foo/TASKS.md"
+echo "# Works" > "$T/magi/01-foo/WORKS.md"
+echo "# Drift" > "$T/magi/01-foo/DRIFT.md"
 JSON=$(run_in "$T")
 assert_eq "state" "CODE_REVIEWED" "$(jq -r .state <<<"$JSON")"
 assert_eq "magi.commit allowed" "true" "$(jq -r '.allowed_skills | index("magi.commit") != null' <<<"$JSON")"
@@ -161,8 +161,8 @@ cleanup "$T"
 echo "=== Case 9: HOTFIX mode (HOTFIX.md, no TASKS — magi.go still allowed) ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Hotfix" > "$T/docs/01-foo/HOTFIX.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Hotfix" > "$T/magi/01-foo/HOTFIX.md"
 JSON=$(run_in "$T")
 assert_eq "state" "PLANNING" "$(jq -r .state <<<"$JSON")"
 assert_eq "hotfix_mode" "true" "$(jq -r .hotfix_mode <<<"$JSON")"
@@ -173,8 +173,8 @@ cleanup "$T"
 echo "=== Case 10: warning tasks_without_plan ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-printf "## M1\n- [ ] T1.1 — orphan\n" > "$T/docs/01-foo/TASKS.md"
+mkdir -p "$T/magi/01-foo"
+printf "## M1\n- [ ] T1.1 — orphan\n" > "$T/magi/01-foo/TASKS.md"
 JSON=$(run_in "$T")
 assert_eq "warning tasks_without_plan present" "true" \
   "$(jq -r '[.warnings[] | select(.type == "tasks_without_plan")] | length > 0' <<<"$JSON")"
@@ -184,11 +184,11 @@ cleanup "$T"
 echo "=== Case 11: warning stale_plan_review ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-echo "# Review" > "$T/docs/01-foo/MAGI_PLAN_REVIEW.md"
+mkdir -p "$T/magi/01-foo"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+echo "# Review" > "$T/magi/01-foo/MAGI_PLAN_REVIEW.md"
 sleep 1
-echo "# Plan v2" > "$T/docs/01-foo/PLAN.md"
+echo "# Plan v2" > "$T/magi/01-foo/PLAN.md"
 JSON=$(run_in "$T")
 assert_eq "warning stale_plan_review present" "true" \
   "$(jq -r '[.warnings[] | select(.type == "stale_plan_review")] | length > 0' <<<"$JSON")"
@@ -198,15 +198,15 @@ cleanup "$T"
 echo "=== Case 12: --sprint flag overrides latest detection ==="
 T=$(make_repo)
 echo "# README" > "$T/README.md"
-mkdir -p "$T/docs/01-foo" "$T/docs/02-bar"
-echo "# Plan" > "$T/docs/01-foo/PLAN.md"
-printf "## M1\n- [ ] T1.1\n" > "$T/docs/02-bar/TASKS.md"
-echo "# Plan2" > "$T/docs/02-bar/PLAN.md"
+mkdir -p "$T/magi/01-foo" "$T/magi/02-bar"
+echo "# Plan" > "$T/magi/01-foo/PLAN.md"
+printf "## M1\n- [ ] T1.1\n" > "$T/magi/02-bar/TASKS.md"
+echo "# Plan2" > "$T/magi/02-bar/PLAN.md"
 JSON_DEFAULT=$(run_in "$T")
 JSON_EXPLICIT=$(run_in "$T" --sprint 01-foo)
 assert_eq "default state (latest)" "TASKS_READY" "$(jq -r .state <<<"$JSON_DEFAULT")"
 assert_eq "explicit sprint state" "PLANNING" "$(jq -r .state <<<"$JSON_EXPLICIT")"
-assert_eq "explicit sprint dir" "docs/01-foo" "$(jq -r .sprint_dir <<<"$JSON_EXPLICIT")"
+assert_eq "explicit sprint dir" "magi/01-foo" "$(jq -r .sprint_dir <<<"$JSON_EXPLICIT")"
 cleanup "$T"
 
 # ── Summary ──────────────────────────────────────────────────────────────

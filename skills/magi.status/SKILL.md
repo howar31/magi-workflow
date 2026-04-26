@@ -83,7 +83,7 @@ the same commit:
 | State | Suggestion |
 |-------|------------|
 | `BOOTSTRAP` | `/magi.init`（`/magi.setup` first if no `~/.config/magi-workflow/config.json` exists） |
-| `INITIALIZED` | `/magi.plan "<description>"` 或 bare `/magi.plan` 從 `docs/BACKLOG.md` 選取 |
+| `INITIALIZED` | `/magi.plan "<description>"` 或 bare `/magi.plan` 從 `magi/BACKLOG.md` 選取 |
 | `PLANNING` | `/magi.tasks`（hotfix → `/magi.go`；可選 `/magi.review-plan` 先 review） |
 | `PLAN_REVIEWED` | `/magi.tasks` |
 | `TASKS_READY` | `/magi.go` |
@@ -108,7 +108,7 @@ Concrete example (state=PLANNING, one warning):
 
 ```
 State: PLANNING
-Sprint: docs/03-add-state-skill
+Sprint: magi/03-add-state-skill
 Next:  /magi.tasks  （或 hotfix → /magi.go；可選 /magi.review-plan 先 review）
 
 ⚠ MAGI_PLAN_REVIEW.md outdated (PLAN.md modified after last review)

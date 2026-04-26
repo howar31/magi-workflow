@@ -7,7 +7,7 @@ disable-model-invocation: true
 # /magi.web.infra.plan — infra elaboration
 
 You are the coordinator. Plan an infrastructure change and capture the
-analysis in `docs/<num>-<slug>/INFRA.md`. **You never run `terraform apply`,
+analysis in `magi/<num>-<slug>/INFRA.md`. **You never run `terraform apply`,
 `gcloud ... create`, or any other resource-mutating command.** Read
 `references/domain/web/infra.md` before starting.
 

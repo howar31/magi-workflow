@@ -188,7 +188,7 @@ follow the project's existing toolchain.
 - Reading any file in the project.
 - Running tests, lints, type-checks, formatters in dry-run / check mode.
 - Running `git status` / `git diff` / `git log`.
-- Creating files inside the sprint dir (`docs/<num>-<slug>/`) — this is
+- Creating files inside the sprint dir (`magi/<num>-<slug>/`) — this is
   scratch space the workflow owns.
 - Spawning a subagent dispatch via the Task tool, when the slash command
   expects it.
@@ -200,7 +200,7 @@ hook fails, surface the cause and let the user decide. Never `--no-verify`.
 
 ## 6. SSOT discipline
 
-A sprint's `docs/<num>-<slug>/` folder is the single source of truth for
+A sprint's `magi/<num>-<slug>/` folder is the single source of truth for
 that feature. It owns:
 
 - `PLAN.md` — early exploration, options, recommendations
