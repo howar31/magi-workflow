@@ -1,14 +1,14 @@
 # magi-workflow
 
-[![License: MIT](https://img.shields.io/github/license/howar31/magi-workflow?color=blue)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.8.0-blue)](.claude-plugin/plugin.json)
-[![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-CC785C)](https://claude.com/claude-code)
-[![Made with Bash](https://img.shields.io/badge/made%20with-Bash-1f425f?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
-[![Conventional Commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow)](https://www.conventionalcommits.org)
-[![GitHub stars](https://img.shields.io/github/stars/howar31/magi-workflow?style=social)](https://github.com/howar31/magi-workflow/stargazers)
-[![Last commit](https://img.shields.io/github/last-commit/howar31/magi-workflow)](https://github.com/howar31/magi-workflow/commits/main)
-[![Open issues](https://img.shields.io/github/issues/howar31/magi-workflow)](https://github.com/howar31/magi-workflow/issues)
-[![Sponsor on Ko-fi](https://img.shields.io/badge/sponsor-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/howar31)
+[![License: MIT](https://img.shields.io/github/license/howar31/magi-workflow?color=blue&style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/badge/version-v0.8.0-blue?style=flat-square)](.claude-plugin/plugin.json)
+[![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-CC785C?style=flat-square)](https://claude.com/claude-code)
+[![Made with Bash](https://img.shields.io/badge/made%20with-Bash-1f425f?logo=gnu-bash&logoColor=white&style=flat-square)](https://www.gnu.org/software/bash/)
+[![Conventional Commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow?style=flat-square)](https://www.conventionalcommits.org)
+[![GitHub stars](https://img.shields.io/github/stars/howar31/magi-workflow?style=flat-square)](https://github.com/howar31/magi-workflow/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/howar31/magi-workflow?style=flat-square)](https://github.com/howar31/magi-workflow/commits/main)
+[![Open issues](https://img.shields.io/github/issues/howar31/magi-workflow?style=flat-square)](https://github.com/howar31/magi-workflow/issues)
+[![Sponsor on Ko-fi](https://img.shields.io/badge/sponsor-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white&style=flat-square)](https://ko-fi.com/howar31)
 
 > 多模型協作的軟體工程 workflow plugin（for Claude Code）
 
