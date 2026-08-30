@@ -8,7 +8,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/howar31/magi-workflow?style=flat-square)](https://github.com/howar31/magi-workflow/stargazers)
 [![Last commit](https://img.shields.io/github/last-commit/howar31/magi-workflow?style=flat-square)](https://github.com/howar31/magi-workflow/commits/main)
 [![Open issues](https://img.shields.io/github/issues/howar31/magi-workflow?style=flat-square)](https://github.com/howar31/magi-workflow/issues)
-[![Sponsor on Ko-fi](https://img.shields.io/badge/sponsor-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white&style=flat-square)](https://ko-fi.com/howar31)
+[![Sponsor](https://img.shields.io/badge/Sponsor-donate.howar31.com-b4532c?style=flat-square&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTIwLjg0IDQuNjFhNS41IDUuNSAwIDAgMC03Ljc4IDBMMTIgNS42N2wtMS4wNi0xLjA2YTUuNSA1LjUgMCAwIDAtNy43OCA3Ljc4bDEuMDYgMS4wNkwxMiAyMS4yM2w3Ljc4LTcuNzggMS4wNi0xLjA2YTUuNSA1LjUgMCAwIDAgMC03Ljc4eiIvPjwvc3ZnPg==)](https://donate.howar31.com/)
 
 > 多模型協作的軟體工程 workflow plugin（for Claude Code）
 
