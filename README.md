@@ -51,7 +51,7 @@ flowchart TD
     Init --> Plan
 
     subgraph Dispatch["🎯 /magi:plan 智慧型 dispatcher"]
-        Plan["/magi:plan &quot;&lt;任何描述&gt;&quot;<br/>type × scale 語意分類<br/>(zh-TW / en / 混雜均可)"]
+        Plan["/magi:plan #quot;#lt;任何描述#gt;#quot;<br/>type × scale 語意分類<br/>(zh-TW / en / 混雜均可)"]
         Plan --> Route{路由 + user 確認}
     end
 
